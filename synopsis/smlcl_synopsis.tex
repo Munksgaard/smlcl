@@ -1,0 +1,222 @@
+\documentclass[a4paper, 10pt]{article}
+
+\usepackage[utf8x]{inputenc}
+\usepackage[english]{babel}
+\usepackage{fancyhdr}
+\usepackage{hyperref}
+\usepackage{url}
+\usepackage{graphicx}
+\usepackage{ku-forside}
+\usepackage{xcolor, colortbl}
+\usepackage{cite}
+\usepackage{url, hyperref}
+\usepackage{amsmath}
+
+%\setlength\parskip{1em}
+%\setlength{\parindent}{0pt}
+\def\arraystretch{2}
+
+\fancyhead[LO,RE]{smlcl \\ }
+\fancyhead[LE,RO]{Philip Munksgaard \\ \today}
+\pagestyle{fancy}
+
+\titel{smlcl}
+\undertitel{An ML library for utilizing parallel architectures using OpenCL}
+\opgave{Bachelorproject}
+\forfatter{\shortstack[l]{P. Munksgaard (240789)}}
+\dato{\today}
+\vejleder{M. Elsman}
+
+\begin{document}
+\maketitle
+
+\newpage
+
+\tableofcontents
+
+\newpage
+
+\section{Introduction}
+
+TODO
+
+\section{Problem description}
+
+In this project \emph{I want to examine whether or not it is possible to
+construct a Standard ML library for utilizing parallel architectures
+using OpenCL, that will enable users to achieve significant speedups
+in potentially parallel computations compared to traditional
+sequential architectures}.
+
+\section{Background}
+
+OpenCL is a specification for a system that allows developers to take
+advantage of parallel architectures such as graphics cards or
+multiple-core CPUs in a unified manner, thus achieving improved
+performance on parallel computations such as mapping over lists,
+matrix manipulation, graphics rendering and more. Many different
+vendors have implemented standard for their parallel architectures
+such as Nvidia, Intel, AMD, and ATI.
+
+The standard specification uses ``kernels'' written in a strict subset
+of C, and ``hosts'' written in \verb+C+/\verb-C++-, that interface
+with these kernels, to set up and run computations in parallel. We
+want to construct a library for Standard ML that makes easy it do
+parallel computations with OpenCL in a simple unified way. The goal is
+to abstract away many of the technicalities and specifics of dealing
+with OpenCL, and provide a simple and straightforward interface hiding
+some of the complexities of the underlying system.
+
+Furthermore, the project will include development of some illustrative
+examples that uses this library to perform parallel computations and a
+comparison to sequential architectures using these examples.
+
+\section{Limitations}
+
+The project will not include creation of user guides or structured
+testing of the developed software beyond some basic examples as
+described above.
+
+The library will primarily be developed on a 64 bit machine equipped
+with an Nvidia graphics card running Linux. The project will therefore
+not include ensuring that the library runs equally well on other
+operating systems or architectures.
+
+\section{Risks}
+
+TODO
+
+\section{Project timeline}
+
+\subsection{Execution of OpenCL kernels using a simplified API}
+\label{sec:clibrary}
+
+\begin{description}
+  \item[Product] \hfill \\
+    C library that allows for execution of OpenCL kernels using a
+    simplified API.
+  \item[Resources] \hfill \\
+    None.
+  \item[Internal dependencies] \hfill \\
+    None.
+  \item[Time requirement] \hfill \\
+    2-3 days of work.
+  \item[Deadline] \hfill \\
+    Sunday, March 10th.
+\end{description}
+
+\subsection{Execution of OpenCL kernels from Moscow ML}
+\label{sec:mosmlffi}
+
+\begin{description}
+  \item[Product] \hfill \\
+    Moscow ML foreign function interface that allows for basic
+    interaction with the above C library and execution of kernels
+    passed as strings.
+  \item[Resources] \hfill \\
+    None.
+  \item[Internal dependencies] \hfill \\
+    The above mentioned C library.
+  \item[Time requirement] \hfill \\
+    3-4 days of work.
+  \item[Deadline] \hfill \\
+    Wednesday, April 17th.
+\end{description}
+
+\subsection{Parallel computations using the MosML FFI}
+
+\begin{description}
+  \item[Product] \hfill \\
+    2-3 examples written for the above Moscow ML foreign function
+    interface, utilizing the parallel architecture using OpenCL.
+  \item[Resources] \hfill \\
+    None.
+  \item[Internal dependencies] \hfill \\
+    The C library and the foreign function interface for Moscow ML.
+  \item[Time requirement] \hfill \\
+    1-2 days of work.
+  \item[Deadline] \hfill \\
+    Sunday, April 21st.
+\end{description}
+
+\subsection{Standard ML library for converting abstract data into
+  OpenCL kernels}
+
+\begin{description}
+  \item[Product] \hfill \\
+    A Standard ML library, smlcl, that abstracts away the complexities of the
+    foreign function interface described above, and allows for kernels
+    to be expressed using abstract data structures.
+  \item[Resources] \hfill \\
+    None.
+  \item[Internal dependencies] \hfill \\
+    Foreign function interface for MosML
+  \item[Time requirement] \hfill \\
+    6-7 days of work.
+  \item[Deadline] \hfill \\
+    Sunday, May 12th.
+\end{description}
+
+\subsection{Porting examples to Standard ML using abstract data structures}
+
+\begin{description}
+  \item[Product] \hfill \\ A port of the above examples, this time
+    written purely in Standard ML, using the library above with
+    abstract data structures representing parallel computations.
+  \item[Resources] \hfill \\
+    None.
+  \item[Internal dependencies] \hfill \\
+    smlcl
+  \item[Time requirement] \hfill \\
+    1-2 days of work.
+  \item[Deadline] \hfill \\
+    Friday, May 17th.
+\end{description}
+
+\subsection{Compare performance of smlcl with traditional sequential
+  computation}
+
+\begin{description}
+  \item[Product] \hfill \\ A comparison between the performance of
+    smlcl and traditional sequential computation.
+  \item[Resources] \hfill \\
+    None.
+  \item[Internal dependencies] \hfill \\
+    smlcl
+  \item[Time requirement] \hfill \\
+    2-3 days of work.
+  \item[Deadline] \hfill \\
+    Wednesday, May 22nd.
+\end{description}
+
+
+\subsection{Report}
+
+\begin{description}
+  \item[Product] \hfill \\ The finished report on the project
+  \item[Resources] \hfill \\
+    None.
+  \item[Internal dependencies] \hfill \\
+    All the above.
+  \item[Time requirement] \hfill \\
+    5-6
+  \item[Deadline] \hfill \\
+    Monday, June 3rd.
+\end{description}
+
+\section{Evaluations}
+
+TODO
+
+\section{References}
+
+\begin{itemize}
+  \item hopencl - \url{https://github.com/HIPERFIT/hopencl} \\
+  \item PyOpenCL - \url{http://mathema.tician.de/software/pyopencl} \\
+  \item OpenCL specification -
+    \url{http://www.khronos.org/registry/cl/specs/opencl-1.2.pdf} \\
+  \item OpenCL for Nvidia - \url{https://developer.nvidia.com/opencl}
+    \\
+\end{itemize}
+
+\end{document}
