@@ -38,7 +38,15 @@
 
 \section{Introduction}
 
-TODO
+In recent years, doing parallel computations using graphics cards and
+other parallel architectures have become increasingly easy using such
+frameworks as CUDA and OpenCL. Parallel computations offer massive
+performance gains for certain kinds of computation, and is already a
+crucial part of software development and computer science.
+
+However, programming for OpenCL is done through a combination of C/C++
+libraries and OpenCLs own language for specifying kernels. We wish to
+make it easy to utilize OpenCLs capabilities through Standard ML.
 
 \section{Problem description}
 
@@ -84,7 +92,20 @@ operating systems or architectures.
 
 \section{Risks}
 
-TODO
+One important risk is that doing a decent translation from abstract
+data structure in SML to a kernel in OpenCLs language will prove a big
+difficulty, and take a lot of time.
+
+Furthermore, OpenCL has a lot of complexity and internal choices that
+have to be made when you're running a program, and it might be
+difficult to properly take advantage of this and model the parallel
+computations in such a way that significant performance gains are
+possible.
+
+Lastly, the foreign function interface from Moscow ML to OpenCL might
+prove a challenge, as there is a significant lack of documentation for
+Moscow ML, and since it hasn't been actively developed for a number of
+years.
 
 \section{Project timeline}
 
@@ -204,9 +225,17 @@ TODO
     Monday, June 3rd.
 \end{description}
 
-\section{Evaluations}
+\section{Evaluation}
 
-TODO
+The project should be evaluated based on whether or not it was
+possible to achieve its goals of interfacing with parallel
+architectures from Standard ML using OpenCL. A successful
+implementation of smlcl should make it possible to perform
+computations in parallel that is significantly faster than performing
+the same computation in a sequential manner. It should also make it
+easy to express such computations using Standard ML data structures,
+thus abstracting away many of the complexities of OpenCL, including
+the kernels.
 
 \section{References}
 
