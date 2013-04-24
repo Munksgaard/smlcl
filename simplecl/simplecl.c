@@ -32,7 +32,7 @@ simplecl_machine sclInit(int *return_err) {
     return NULL;
   }
 
-  err = clGetDeviceIDs(platform, CL_DEVICE_TYPE_GPU , 1, &device, &num_devices_returned);
+  err = clGetDeviceIDs(platform, CL_DEVICE_TYPE_GPU, 1, &device, &num_devices_returned);
   if (err != CL_SUCCESS) {
     printf("Error n clGetDeviceIDs, Line %u in file %s !!! \n\n", __LINE__, __FILE__);
     *return_err = SIMPLECL_FAILURE;
