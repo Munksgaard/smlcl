@@ -19,10 +19,12 @@ int sclRun(simplecl_machine machine /* queue */,
            simplecl_kernel kernel /* kernel */,
            const size_t work_size /* work size */,
            const int input_num /* number of input arrays */,
-           const size_t * input_sizes /* size of types in input arrays */,
+           const int * input_sizes /* size of input arrays */,
+           const size_t * input_type_sizes /* size of types in input arrays */,
            void ** input_arrays /* input arrays */,
            const int output_num /* number of output arrays */,
-           const size_t * output_sizes /* size of types in output arrays */,
+           const int * output_sizes /* size of output arrays */,
+           const size_t * output_type_sizes /* size of types in output arrays */,
            void ** output_arrays /* output arrays */ );
 
 

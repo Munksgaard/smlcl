@@ -102,10 +102,12 @@ int sclRun(simplecl_machine machine,
            simplecl_kernel kernel,
            const size_t work_size,
            const int input_num,
-           const size_t * input_sizes,
+           const int * input_sizes,
+           const size_t * input_type_sizes,
            void ** input_arrays,
            const int output_num,
-           const size_t * output_sizes,
+           const int * output_sizes,
+           const size_t * output_type_sizes,
            void ** output_arrays) {
 
   int err = CL_SUCCESS;
@@ -117,7 +119,7 @@ int sclRun(simplecl_machine machine,
   for (i=0; i<input_num; i++) {
     input_buffers[i] = clCreateBuffer(machine->context,
                                       CL_MEM_READ_ONLY,
-                                      input_sizes[i] * work_size,
+                                      input_type_sizes[i] * input_sizes[i],
                                       NULL,
                                       &err);
     if (err != CL_SUCCESS) {
@@ -129,7 +131,7 @@ int sclRun(simplecl_machine machine,
                                input_buffers[i],
                                CL_FALSE,
                                0,
-                               input_sizes[i] * work_size,
+                               input_type_sizes[i] * input_sizes[i],
                                input_arrays[i],
                                0,
                                NULL,
@@ -143,7 +145,7 @@ int sclRun(simplecl_machine machine,
   for (i=0; i<output_num; i++) {
     output_buffers[i] = clCreateBuffer(machine->context,
                                        CL_MEM_WRITE_ONLY,
-                                       output_sizes[i] * work_size,
+                                       output_type_sizes[i] * output_sizes[i],
                                        NULL,
                                        &err);
     if (err != CL_SUCCESS) {
@@ -170,13 +172,6 @@ int sclRun(simplecl_machine machine,
     return 1;
   }
 
-  err |= clSetKernelArg(kernel->kernel, 3, sizeof(cl_int), (void*)&(work_size));
-  if (err != CL_SUCCESS) {
-    printf("Error in clSetKernelArg, Line %u in file %s !!!\n", __LINE__, __FILE__);
-    printf("Error code is: %d\n\n", err);
-    return 1;
-  }
-
   cl_event event;
 
   err = clEnqueueNDRangeKernel(machine->queue, kernel->kernel, 1, NULL, &work_size, NULL, 0, NULL, &event);
@@ -191,7 +186,7 @@ int sclRun(simplecl_machine machine,
                               output_buffers[i],
                               CL_FALSE,
                               0,
-                              output_sizes[i] * work_size,
+                              output_type_sizes[i] * output_sizes[i],
                               output_arrays[i],
                               0,
                               NULL,

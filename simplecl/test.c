@@ -1,11 +1,7 @@
 #include <simplecl.h>
 
-const char * vectoradd_src = "__kernel void VectorAdd(__global const float* a, __global const float* b, __global float* c, int iNumElements) {\n"
+const char * vectoradd_src = "__kernel void VectorAdd(__global const float* a, __global const float* b, __global float* c) {\n"
   "    int iGID = get_global_id(0);\n"
-  "    if (iGID >= iNumElements) {\n"
-  "        return;\n"
-  "    }\n"
-  "\n"
   "    c[iGID] = a[iGID] + b[iGID] * b[0];\n"
   "}\n";
 
@@ -23,14 +19,16 @@ int main() {
   simplecl_kernel kernel = sclCompile(machine, "VectorAdd", vectoradd_src, &err);
 
   const cl_int num_values = 100000;
-  size_t input_sizes[2] = {sizeof(cl_float), sizeof(cl_float)};
+  size_t input_type_sizes[2] = {sizeof(cl_float), sizeof(cl_float)};
   cl_float array_1[num_values];
   cl_float array_2[num_values];
   cl_float * input_arrays[2] = {array_1, array_2};
+  cl_int input_sizes[2] = {num_values, num_values};
 
-  size_t output_sizes[1] = {sizeof(cl_float)};
+  size_t output_type_sizes[1] = {sizeof(cl_float)};
   cl_float array_dst[num_values];
   cl_float * output_arrays[1] = {array_dst};
+  int output_sizes[1] = {num_values};
 
   // Initializing arrays
   for(int i = 0; i < num_values; i++) {
@@ -40,7 +38,7 @@ int main() {
 
 
 
-  err = sclRun(machine, kernel, num_values, 2, input_sizes, (void**)input_arrays, 1, output_sizes, (void**)output_arrays);
+  err = sclRun(machine, kernel, num_values, 2, input_sizes, input_type_sizes, (void**)input_arrays, 1, output_sizes, output_type_sizes, (void**)output_arrays);
 
   printf("The first 10 elements are:\n");
   for (int i=0; i<10; i++) {
