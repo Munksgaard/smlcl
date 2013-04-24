@@ -1,0 +1,13 @@
+ann
+  "allowFFI true"
+in
+  local
+    $(SML_LIB)/basis/basis.mlb
+    $(SML_LIB)/basis/mlton.mlb
+    simplecl.sig
+    simplecl.sml
+  in
+    signature SIMPLECL
+    structure SimpleCL
+  end
+end
