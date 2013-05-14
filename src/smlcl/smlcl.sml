@@ -82,6 +82,23 @@ structure Smlcl : SMLCL = struct
   fun fromBuf (Int_ (_, f, _), n, b, m) = f (m, n, b)
     | fromBuf (Real_ (_, f, _), n, b, m) = f (m, n, b);
 
+  fun toBuf arr (t as Int_ (_, _, f), n, b, m) =
+      if Array.length arr <= n then
+          if f (m, b, arr) then
+              (t, Array.length arr, b, m)
+          else
+              raise OpenCL
+      else
+          raise Fail "buffer not big enough"
+    | toBuf arr (t as Real_ (_, _, f), n, b, m) =
+      if Array.length arr <= n then
+          if f (m, b, arr) then
+              (t, Array.length arr, b, m)
+          else
+              raise OpenCL
+      else
+          raise Fail "buffer not big enough";
+
   val compile = _import "cSclCompile" : MLton.Pointer.t * string * string
                                         -> MLton.Pointer.t;
 

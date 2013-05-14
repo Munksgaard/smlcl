@@ -18,7 +18,7 @@ signature SMLCL = sig
 
   val fromBuf : 'a buf -> 'a array;
 
-  (* val toBuf : 'a array -> 'a buf -> unit *)
+  val toBuf : 'a array -> 'a buf -> 'a buf
 
   val kcall2 : ('a T, 'b T, 'c T)kern2 -> ('a buf * 'b buf) -> int
                -> 'c buf;

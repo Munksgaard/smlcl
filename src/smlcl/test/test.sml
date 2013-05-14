@@ -24,3 +24,7 @@ val rbuf = kcall2 k (b1, b2) 3;
 
 val r = fromBuf rbuf;
 printRList (rarr2list r);
+
+val b3 = toBuf (Array.fromList [42.0, 43.0, 44.0]) rbuf;
+val a3 = fromBuf b3;
+printRList (rarr2list a3);
