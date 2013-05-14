@@ -5,8 +5,10 @@ structure Smlcl : SMLCL = struct
   type sz = int;
   datatype 'a T = Int_ of (machine * 'a array -> 'a buffP)
                           * (machine * sz * 'a buffP -> 'a array)
+                          * (machine * 'a buffP * 'a array -> bool)
                 | Real_ of (machine * 'a array -> 'a buffP)
-                           * (machine * sz * 'a buffP -> 'a array);
+                           * (machine * sz * 'a buffP -> 'a array)
+                           * (machine * 'a buffP * 'a array -> bool);
   type 'a buf = 'a T * sz * 'a buffP * machine;
   type ('a1, 'a2, 'r)kern2 = machine * MLton.Pointer.t * string
                              * (string * 'a1) * (string * 'a2)
@@ -59,16 +61,26 @@ structure Smlcl : SMLCL = struct
               raise Fail "Something went wrong"
       end;
 
-  val Int = Int_(intArr2buf, intBuf2arr);
-  val Real = Real_(realArr2buf, realBuf2arr);
+  val toRealBuf =
+      _import "cSclWriteBuffer" : MLton.Pointer.t * int *
+                                  MLton.Pointer.t * real array -> bool;
 
-  fun mkBuf m (t as Int_(f, _)) arr =
+  val toIntBuf =
+      _import "cSclWriteBuffer" : MLton.Pointer.t * int *
+                                  MLton.Pointer.t * int array -> bool;
+
+  val Int = Int_(intArr2buf, intBuf2arr,
+                 fn (m, b, a) => toIntBuf (m, intSize, b, a));
+  val Real = Real_(realArr2buf, realBuf2arr,
+                  fn (m, b, a) => toRealBuf (m, realSize, b, a));
+
+  fun mkBuf m (t as Int_(f, _, _)) arr =
       (t, Array.length arr, f (m, arr), m)
-    | mkBuf m (t as Real_(f, _)) arr =
+    | mkBuf m (t as Real_(f, _, _)) arr =
       (t, Array.length arr, f (m, arr), m);
 
-  fun fromBuf (Int_ (_, f), n, b, m) = f (m, n, b)
-    | fromBuf (Real_ (_, f), n, b, m) = f (m, n, b);
+  fun fromBuf (Int_ (_, f, _), n, b, m) = f (m, n, b)
+    | fromBuf (Real_ (_, f, _), n, b, m) = f (m, n, b);
 
   val compile = _import "cSclCompile" : MLton.Pointer.t * string * string
                                         -> MLton.Pointer.t;
@@ -97,11 +109,11 @@ structure Smlcl : SMLCL = struct
              ((t1, sz1, bp1, _), (t2, sz2, bp2, _))
              worksize =
       case rt of
-          Int_ (_, _) => let val rbuf = mkBufEmpty (m, intSize, worksize,
+          Int_ (_, _, _) => let val rbuf = mkBufEmpty (m, intSize, worksize,
                                                     MLton.Pointer.null);
                              val _ = kcall2_ (m, k, worksize, bp1, bp2, rbuf)
                          in (rt, worksize, rbuf, m) end
-        | Real_ (_, _) => let val rbuf = mkBufEmpty (m, realSize, worksize,
+        | Real_ (_, _, _) => let val rbuf = mkBufEmpty (m, realSize, worksize,
                                                      MLton.Pointer.null);
                               val _ = kcall2_ (m, k, worksize, bp1, bp2, rbuf)
                           in (rt, worksize, rbuf, m) end;
