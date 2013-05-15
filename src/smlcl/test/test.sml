@@ -28,3 +28,10 @@ printRList (rarr2list r);
 val b3 = toBuf (Array.fromList [42.0, 43.0, 44.0]) rbuf;
 val a3 = fromBuf b3;
 printRList (rarr2list a3);
+
+val b4 = toBuf (Array.fromList [11.0, 12.0]) rbuf;
+val a4 = fromBuf b4;
+printRList (rarr2list a4);
+
+val b5 = (toBuf (Array.fromList [11.0, 12.0, 13.0, 14.0]) rbuf;
+          print "This shouldn't happen\n") handle Fail _ => print "yes\n";
