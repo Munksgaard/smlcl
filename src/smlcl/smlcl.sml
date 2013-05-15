@@ -114,9 +114,6 @@ structure Smlcl : SMLCL = struct
                                                 * MLton.Pointer.t
                                                 -> MLton.Pointer.t;
 
-  val setBufArg = _import "cSclSetArg" : MLton.Pointer.t * int * int
-                                         * MLton.Pointer.t -> unit;
-
   val kcall2_ = _import "cSclRun2_1" : MLton.Pointer.t * MLton.Pointer.t
                                        * int * MLton.Pointer.t
                                        * MLton.Pointer.t
