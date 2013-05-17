@@ -38,11 +38,11 @@
 
 \section{Introduction}
 
-In recent years, doing parallel computations using graphics cards and
-other parallel architectures have become increasingly easy using such
-frameworks as CUDA and OpenCL. Parallel computations offer massive
-performance gains for certain kinds of computation, and is already a
-crucial part of software development and computer science.
+In recent years, performing parallel computations using graphics cards
+and other parallel architectures have become increasingly easy using
+such frameworks as CUDA and OpenCL. Parallel computations offer
+massive performance gains for certain kinds of computation, and is
+already a crucial part of software development and computer science.
 
 However, programming for OpenCL is done through a combination of C/C++
 libraries and OpenCLs own language for specifying kernels. We wish to
@@ -50,40 +50,58 @@ make it easy to utilize OpenCLs capabilities through Standard ML.
 
 \section{Problem description}
 
-In this project \emph{I want to examine whether or not it is possible to
-construct a Standard ML library for utilizing parallel architectures
-using OpenCL, that will enable users to achieve significant speedups
-in potentially parallel computations compared to traditional
-sequential architectures}.
+In this project \emph{I want to examine whether or not it is possible
+  to construct a Standard ML library for utilizing parallel
+  architectures using OpenCL, that will enable users to achieve
+  significant speedups in potentially parallel computations compared
+  to traditional sequential architectures}.
+
+\section{Learning Objectives}
+
+The goals for this project are
+
+\begin{itemize}
+  \item To describe the OpenCL framework for working with a CPU.
+  \item To analyze the needs for a OpenCL library in MosML.
+  \item Design and implement a simplified C library for OpenCL based
+    on the identified needs, and develop a foreign function interface
+    from Moscow ML to this C library.
+  \item Design and develop an abstraction for working with parallel
+    computations in SML on top of this foreign function interface
+  \item Assert that the implementations work as expected through
+    unit-testing and example code.
+  \item Analyse and discuss performance of smlcl compared to
+    sequential execution.
+  \item Discuss possible extensions for the library.
+\end{itemize}
 
 \section{Background}
 
-OpenCL is a specification for a system that allows developers to take
-advantage of parallel architectures such as graphics cards or
+OpenCL is a cross-platform open standard that enables developers to
+take advantage of parallel architectures such as graphics cards or
 multiple-core CPUs in a unified manner, thus achieving improved
 performance on parallel computations such as mapping over lists,
 matrix manipulation, graphics rendering and more. Many different
-vendors have implemented standard for their parallel architectures
+vendors have implemented the standard for their parallel architectures,
 such as Nvidia, Intel, AMD, and ATI.
 
 The standard specification uses ``kernels'' written in a strict subset
-of C, and ``hosts'' written in \verb+C+/\verb-C++-, that interface
-with these kernels, to set up and run computations in parallel. We
-want to construct a library for Standard ML that makes easy it do
+of C, and ``hosts'' written in C/C++, that interface
+with these kernels to set up and run computations in parallel. We
+want to construct a library for Standard ML that makes easy it perform
 parallel computations with OpenCL in a simple unified way. The goal is
 to abstract away many of the technicalities and specifics of dealing
 with OpenCL, and provide a simple and straightforward interface hiding
-some of the complexities of the underlying system.
+many of the complexities of the underlying system.
 
 Furthermore, the project will include development of some illustrative
 examples that uses this library to perform parallel computations and a
 comparison to sequential architectures using these examples.
 
-\section{Limitations}
+\section{Scope}
 
-The project will not include creation of user guides or structured
-testing of the developed software beyond some basic examples as
-described above.
+The project will not include creation of user guides or similar for
+the library beyond the different examples as described above.
 
 The library will primarily be developed on a 64 bit machine equipped
 with an Nvidia graphics card running Linux. The project will therefore
@@ -92,20 +110,21 @@ operating systems or architectures.
 
 \section{Risks}
 
-One important risk is that doing a decent translation from abstract
-data structure in SML to a kernel in OpenCLs language will prove a big
-difficulty, and take a lot of time.
+One important risk is that doing a decent translation from data
+structure in SML to a kernel in OpenCLs language will prove a big
+difficulty and take a lot of time.
 
 Furthermore, OpenCL has a lot of complexity and internal choices that
 have to be made when you're running a program, and it might be
 difficult to properly take advantage of this and model the parallel
 computations in such a way that significant performance gains are
-possible.
+possible, without exposing too much of the internal workings of OpenCL
+to the user.
 
-Lastly, the foreign function interface from Moscow ML to OpenCL might
-prove a challenge, as there is a significant lack of documentation for
-Moscow ML, and since it hasn't been actively developed for a number of
-years.
+%% Lastly, the foreign function interface from Moscow ML to OpenCL might
+%% prove a challenge, as there is a significant lack of documentation for
+%% Moscow ML, and since it hasn't been actively developed for a number of
+%% years.
 
 \section{Project timeline}
 
@@ -246,6 +265,8 @@ the kernels.
     \url{http://www.khronos.org/registry/cl/specs/opencl-1.2.pdf} \\
   \item OpenCL for Nvidia - \url{https://developer.nvidia.com/opencl}
     \\
+  \item Moscow ML Library Documentation - \url{http://www.itu.dk/~sestoft/mosmllib/index.html} \\
+  \item Moscow ML Owner's Manual - \url{http://www.itu.dk/people/sestoft/mosml/manual.pdf} \\
 \end{itemize}
 
 \end{document}
