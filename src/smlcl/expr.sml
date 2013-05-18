@@ -4,10 +4,6 @@ signature EXPR = sig
   type ('a, 'c)src1;
   type ('a, 'b, 'c)src2;
 
-  type 'a buf
-  val RealB : real buf
-  val IntB : int buf
-
   val RealT : real T;
   val IntT : int T;
 
@@ -32,8 +28,9 @@ signature EXPR = sig
   val IntToReal : int expr -> real expr;
   val RealToInt : real expr -> int expr;
 
-  val compile1 : ((index -> 'a expr) -> 'c expr) -> 'a buf -> ('a, 'c)src1;
-  val compile2 : ((index -> 'a expr) * (index -> 'b expr) -> 'c expr) -> ('a buf * 'b buf) -> ('a, 'b, 'c)src2;
+  val compile1 : ((index -> 'a expr) -> 'r expr) -> 'a T -> 'r T -> string -> ('a, 'c)src1;
+  val compile2 : ((index -> 'a expr) * (index -> 'b expr) -> 'r expr) -> ('a T * 'b T) -> 'r T
+                 -> string -> ('a, 'b, 'r)src2;
 
   val src1toString : ('a, 'b)src1 -> string;
   val src2toString : ('a, 'b, 'c)src2 -> string;
@@ -49,8 +46,6 @@ structure Expr :> EXPR = struct
   datatype 'a T = RealT | IntT;
   type ('a, 'c)src1 = string;
   type ('a, 'b, 'c)src2 = string;
-
-  datatype 'a buf = RealB | IntB
 
   datatype primExpr = BinExpr of binOp * primExpr * primExpr
                     | UnExpr of unOp * primExpr
@@ -78,8 +73,8 @@ structure Expr :> EXPR = struct
   fun IntToReal (Expr x) = Expr (UnExpr (OpIntToReal, x));
   fun RealToInt (Expr x) = Expr (UnExpr (OpRealToInt, x));
 
-  fun Buf1 (_: 'a buf) i : 'a expr = Expr (Buf1Expr i);
-  fun Buf2 (_: 'a buf) i : 'a expr = Expr (Buf2Expr i);
+  fun Buf1 (_: 'a T) i : 'a expr = Expr (Buf1Expr i);
+  fun Buf2 (_: 'a T) i : 'a expr = Expr (Buf2Expr i);
 
   fun parens s = "(" ^ s ^ ")"
 
@@ -104,15 +99,28 @@ structure Expr :> EXPR = struct
       | expr (ConstReal r) = Real.toString r
       | expr (UnExpr (ope, e)) = unop ope e
       | expr (BinExpr (ope, e1, e2)) = binop ope e1 e2
-      | expr (Buf1Expr i) = "buf1[" ^ indexStr i ^ "]"
-      | expr (Buf2Expr i) = "buf2[" ^ indexStr i ^ "]"
+      | expr (Buf1Expr i) = "buf0[" ^ indexStr i ^ "]"
+      | expr (Buf2Expr i) = "buf1[" ^ indexStr i ^ "]"
+
+    fun clType RealT n = "__global const double* buf" ^ Int.toString n ^ ",\n"
+      | clType IntT n = "__global const int* buf" ^ Int.toString n ^ ",\n";
+
+    fun rType RealT = "__global const double* bufr) {\n"
+      | rType IntT = "__global const int* bufr) {\n";
+
   in
-      fun compile1 f t1 =
+      fun compile1 f t1 r s =
           case f (Buf1 t1) of
-              Expr e => "r[iGID] = " ^ expr e
-      fun compile2 f (t1, t2) =
+              Expr e =>  "#pragma OPENCL EXTENSION cl_khr_fp64 : enable\n __kernel void "
+                        ^ s ^ "(" ^ clType t1 0 ^ rType r
+                        ^ "int iGID = get_global_id(0);\nbufr[iGID] = "
+                        ^ expr e ^ ";\n}\n"
+      fun compile2 f (t1, t2) r s =
           case f (Buf1 t1, Buf2 t2) of
-              Expr e => "r[iGID] = " ^ expr e
+              Expr e => "#pragma OPENCL EXTENSION cl_khr_fp64 : enable\n __kernel void "
+                        ^ s ^ "(" ^ clType t1 0 ^ clType t2 1 ^ rType r
+                        ^ "int iGID = get_global_id(0);\nbufr[iGID] = "
+                        ^ expr e ^ ";\n}\n"
   end;
 
   fun src1toString src = src;
