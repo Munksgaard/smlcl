@@ -16,7 +16,6 @@ signature EXPR = sig
   val Offset : int -> index;
 
   type 'a expr
-  val constant : string -> 'a expr;
   val Int : int -> int expr;
   val Real : real -> real expr;
   val Add : 'a expr -> 'a expr -> 'a expr;
@@ -51,7 +50,6 @@ structure Expr :> EXPR = struct
 
   datatype primExpr = BinExpr of binOp * primExpr * primExpr
                     | UnExpr of unOp * primExpr
-                    | ConstExpr of string
                     | ConstInt of int
                     | ConstReal of real
                     | Buf1Expr of index
@@ -63,7 +61,6 @@ structure Expr :> EXPR = struct
 
   fun Int n = Expr (ConstInt n);
   fun Real n = Expr (ConstReal n);
-  fun constant s = Expr (ConstExpr s);
   fun Add (Expr x) (Expr y) = Expr (BinExpr (OpAdd, x, y));
   fun Sub (Expr x) (Expr y) = Expr (BinExpr (OpSub, x, y));
   fun Mul (Expr x) (Expr y) = Expr (BinExpr (OpMul, x, y));
