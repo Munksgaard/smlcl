@@ -19,8 +19,6 @@ signature EXPR = sig
   val constant : string -> 'a expr;
   val Int : int -> int expr;
   val Real : real -> real expr;
-  val Buf1 : 'a buf -> index -> 'a expr;
-  val Buf2 : 'a buf -> index -> 'a expr;
   val Add : 'a expr -> 'a expr -> 'a expr;
   val Sub : 'a expr -> 'a expr -> 'a expr;
   val Mul : 'a expr -> 'a expr -> 'a expr;
@@ -37,7 +35,7 @@ signature EXPR = sig
   val IntToReal : int expr -> real expr;
   val RealToInt : real expr -> int expr;
 
-  val compile : ('a buf * 'b buf -> 'c expr) -> ('a buf * 'b buf) -> ('a, 'b, 'c)src2;
+  val compile2 : ((index -> 'a expr) * (index -> 'b expr) -> 'c expr) -> ('a buf * 'b buf) -> ('a, 'b, 'c)src2;
 
   (* val And : bool expr -> bool expr -> bool expr *)
   (* val Eq : ''a expr -> ''a expr -> bool expr *)
@@ -86,8 +84,8 @@ structure Expr : EXPR = struct
   fun IntToReal (Expr x) = Expr (UnExpr (OpIntToReal, x));
   fun RealToInt (Expr x) = Expr (UnExpr (OpRealToInt, x));
 
-  fun Buf1 _ i = Expr (Buf1Expr i);
-  fun Buf2 _ i = Expr (Buf2Expr i);
+  fun Buf1 (_: 'a buf) i : 'a expr = Expr (Buf1Expr i);
+  fun Buf2 (_: 'a buf) i : 'a expr = Expr (Buf2Expr i);
 
   fun parens s = "(" ^ s ^ ")"
 
@@ -119,8 +117,8 @@ structure Expr : EXPR = struct
       | expr (Buf1Expr i) = "buf1[" ^ indexStr i ^ "]"
       | expr (Buf2Expr i) = "buf2[" ^ indexStr i ^ "]"
   in
-      fun compile f (t1, t2) =
-          case f (t1, t2) of
+      fun compile2 f (t1, t2) =
+          case f (Buf1 t1, Buf2 t2) of
               Expr e => "r[iGID] = " ^ expr e
   end;
 
