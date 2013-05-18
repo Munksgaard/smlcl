@@ -99,7 +99,7 @@ structure Expr : EXPR = struct
     fun unop OpNot e = "!" ^ parens (expr e)
       | unop OpIntToReal e = "(real)" ^ parens (expr e)
       | unop OpRealToInt e = "(int)" ^ parens (expr e)
-                                              
+
     and binop OpEq e1 e2 = parens (expr e1 ^ " == " ^ expr e2)
       | binop OpOr e1 e2 = parens (expr e1 ^ " || " ^ expr e2)
       | binop OpAnd e1 e2 = parens (expr e1 ^ " && " ^ expr e2)
@@ -107,8 +107,8 @@ structure Expr : EXPR = struct
       | binop OpSub e1 e2 = parens (expr e1 ^ " - " ^ expr e2)
       | binop OpMul e1 e2 = parens (expr e1 ^ " * " ^ expr e2)
       | binop OpDiv e1 e2 = parens (expr e1 ^ " / " ^ expr e2)
-                                   
-    and triop OpIf c e1 e2 = "if (" ^ expr c ^ ") { " ^ expr e1 ^ "; } else { " 
+
+    and triop OpIf c e1 e2 = "if (" ^ expr c ^ ") { " ^ expr e1 ^ "; } else { "
                              ^ expr e2 ^ "; }"
 
     and expr (ConstInt n) = Int.toString n
