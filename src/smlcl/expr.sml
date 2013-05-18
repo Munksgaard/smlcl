@@ -37,8 +37,6 @@ signature EXPR = sig
 
   val compile2 : ((index -> 'a expr) * (index -> 'b expr) -> 'c expr) -> ('a buf * 'b buf) -> ('a, 'b, 'c)src2;
 
-  (* val And : bool expr -> bool expr -> bool expr *)
-  (* val Eq : ''a expr -> ''a expr -> bool expr *)
 end;
 
 structure Expr : EXPR = struct
@@ -124,5 +122,3 @@ structure Expr : EXPR = struct
 
 
 end;
-
-open Expr;
