@@ -39,7 +39,7 @@ signature EXPR = sig
 
 end;
 
-structure Expr : EXPR = struct
+structure Expr :> EXPR = struct
 
   datatype index = This
                  | Index of int
