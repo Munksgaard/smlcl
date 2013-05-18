@@ -1,6 +1,7 @@
 signature EXPR = sig
 
   type 'a T;
+  type ('a, 'c)src1;
   type ('a, 'b, 'c)src2;
 
   type 'a buf
@@ -31,6 +32,7 @@ signature EXPR = sig
   val IntToReal : int expr -> real expr;
   val RealToInt : real expr -> int expr;
 
+  val compile1 : ((index -> 'a expr) -> 'c expr) -> 'a buf -> ('a, 'c)src1;
   val compile2 : ((index -> 'a expr) * (index -> 'b expr) -> 'c expr) -> ('a buf * 'b buf) -> ('a, 'b, 'c)src2;
 
   val toString : ('a, 'b, 'c)src2 -> string;
@@ -44,6 +46,7 @@ structure Expr :> EXPR = struct
                  | Offset of int;
 
   datatype 'a T = RealT | IntT;
+  type ('a, 'c)src1 = string;
   type ('a, 'b, 'c)src2 = string;
 
   datatype 'a buf = RealB | IntB
@@ -103,6 +106,9 @@ structure Expr :> EXPR = struct
       | expr (Buf1Expr i) = "buf1[" ^ indexStr i ^ "]"
       | expr (Buf2Expr i) = "buf2[" ^ indexStr i ^ "]"
   in
+      fun compile1 f t1 =
+          case f (Buf1 t1) of
+              Expr e => "r[iGID] = " ^ expr e
       fun compile2 f (t1, t2) =
           case f (Buf1 t1, Buf2 t2) of
               Expr e => "r[iGID] = " ^ expr e
