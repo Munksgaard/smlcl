@@ -1,36 +1,43 @@
 signature EXPR = sig
 
   type 'a T;
-  type ('a, 'b, 'c)kern2;
+  type ('a, 'b, 'c)src2;
+
+  type 'a buf
+  val RealB : real buf
+  val IntB : int buf
 
   val RealT : real T;
   val IntT : int T;
 
   type index;
+  val This : index;
+  val Index : int -> index;
+  val Offset : int -> index;
 
-  type ('b1, 'b2, 'a) expr
-  val constant : string -> ('b1, 'b2, 'a) expr;
-  val Int : int -> ('b1, 'b2, int) expr;
-  val Real : real -> ('b1, 'b2, real) expr;
-  val Buf1 : 'b1 T -> index -> ('b1, 'b2, 'b1) expr;
-  val Buf2 : 'b2 T -> index -> ('b1, 'b2, 'b2) expr;
-  val Add : ('b1, 'b2, 'r) expr -> ('b1, 'b2, 'r) expr -> ('b1, 'b2, 'r) expr;
-  val Sub : ('b1, 'b2, 'r) expr -> ('b1, 'b2, 'r) expr -> ('b1, 'b2, 'r) expr;
-  val Mul : ('b1, 'b2, 'r) expr -> ('b1, 'b2, 'r) expr -> ('b1, 'b2, 'r) expr;
-  val Div : ('b1, 'b2, 'r) expr -> ('b1, 'b2, 'r) expr -> ('b1, 'b2, 'r) expr;
+  type 'a expr
+  val constant : string -> 'a expr;
+  val Int : int -> int expr;
+  val Real : real -> real expr;
+  val Buf1 : 'a buf -> index -> 'a expr;
+  val Buf2 : 'a buf -> index -> 'a expr;
+  val Add : 'a expr -> 'a expr -> 'a expr;
+  val Sub : 'a expr -> 'a expr -> 'a expr;
+  val Mul : 'a expr -> 'a expr -> 'a expr;
+  val Div : 'a expr -> 'a expr -> 'a expr;
 
-  val Eq : ('b1, 'b2, 'r) expr -> ('b1, 'b2, 'r) expr -> ('b1, 'b2, bool) expr;
-  val And : ('b1, 'b2, bool) expr -> ('b1, 'b2, bool) expr -> ('b1, 'b2, bool) expr;
-  val Or : ('b1, 'b2, bool) expr -> ('b1, 'b2, bool) expr -> ('b1, 'b2, bool) expr;
-  val Not : ('b1, 'b2, bool) expr -> ('b1, 'b2, bool) expr;
+  val Eq : 'a expr -> 'a expr -> bool expr;
+  val And : bool expr -> bool expr -> bool expr;
+  val Or : bool expr -> bool expr -> bool expr;
+  val Not : bool expr -> bool expr;
 
-  val If : ('b1, 'b2, bool) expr -> ('b1, 'b2, 'r) expr ->
-           ('b1, 'b2, 'r) expr -> ('b1, 'b2, 'r) expr;
+  val If : bool expr -> 'a expr ->
+           'a expr -> 'a expr;
 
-  val IntToReal : ('b1, 'b2, int) expr -> ('b1, 'b2, real) expr;
-  val RealToInt : ('b1, 'b2, real) expr -> ('b1, 'b2, int) expr;
+  val IntToReal : int expr -> real expr;
+  val RealToInt : real expr -> int expr;
 
-  val compile : ('b1, 'b2, 'r) expr -> ('a, 'b, 'c)kern2;
+  val compile : ('a buf * 'b buf -> 'c expr) -> ('a buf * 'b buf) -> ('a, 'b, 'c)src2;
 
   (* val And : bool expr -> bool expr -> bool expr *)
   (* val Eq : ''a expr -> ''a expr -> bool expr *)
@@ -43,7 +50,9 @@ structure Expr : EXPR = struct
                  | Offset of int;
 
   datatype 'a T = RealT | IntT;
-  type ('a, 'b, 'c)kern2 = string;
+  type ('a, 'b, 'c)src2 = string;
+
+  datatype 'a buf = RealB | IntB
 
   datatype primExpr = TriExpr of triOp * primExpr * primExpr * primExpr
                     | BinExpr of binOp * primExpr * primExpr
@@ -57,7 +66,7 @@ structure Expr : EXPR = struct
        and binOp = OpEq | OpAnd | OpAdd | OpSub | OpMul | OpDiv | OpOr
        and unOp = OpNot | OpIntToReal | OpRealToInt
 
-  and ('b1, 'b2, 'a) expr = Expr of primExpr
+  and 'a expr = Expr of primExpr
 
   fun Int n = Expr (ConstInt n);
   fun Real n = Expr (ConstReal n);
@@ -109,10 +118,12 @@ structure Expr : EXPR = struct
       | expr (TriExpr (ope, e1, e2, e3)) = triop ope e1 e2 e3
       | expr (Buf1Expr i) = "buf1[" ^ indexStr i ^ "]"
       | expr (Buf2Expr i) = "buf2[" ^ indexStr i ^ "]"
-  in 
-      fun compile (Expr e) = "r[iGID] = " ^ expr e
-  end; 
-  
+  in
+      fun compile f (t1, t2) =
+          case f (t1, t2) of
+              Expr e => "r[iGID] = " ^ expr e
+  end;
+
 
 end;
 
