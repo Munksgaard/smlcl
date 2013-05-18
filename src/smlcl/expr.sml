@@ -34,6 +34,8 @@ signature EXPR = sig
 
   val compile2 : ((index -> 'a expr) * (index -> 'b expr) -> 'c expr) -> ('a buf * 'b buf) -> ('a, 'b, 'c)src2;
 
+  val toString : ('a, 'b, 'c)src2 -> string;
+
 end;
 
 structure Expr :> EXPR = struct
@@ -109,5 +111,6 @@ structure Expr :> EXPR = struct
               Expr e => "r[iGID] = " ^ expr e
   end;
 
+  fun toString src = src;
 
 end;
