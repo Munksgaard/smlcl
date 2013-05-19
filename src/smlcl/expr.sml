@@ -1,11 +1,10 @@
 signature EXPR = sig
 
   type 'a T;
+  val Int : int T;
+  val Real : real T;
   type ('a, 'c)src1;
   type ('a, 'b, 'c)src2;
-
-  val RealT : real T;
-  val IntT : int T;
 
   type index;
   val This : index;
@@ -13,8 +12,8 @@ signature EXPR = sig
   val Offset : int -> index;
 
   type 'a expr
-  val Int : int -> int expr;
-  val Real : real -> real expr;
+  val IntC : int -> int expr;
+  val RealC : real -> real expr;
   val Add : 'a expr -> 'a expr -> 'a expr;
   val Sub : 'a expr -> 'a expr -> 'a expr;
   val Mul : 'a expr -> 'a expr -> 'a expr;
@@ -44,7 +43,7 @@ structure Expr :> EXPR = struct
                  | Index of int
                  | Offset of int;
 
-  datatype 'a T = RealT | IntT;
+  datatype 'a T = Real | Int;
   type ('a, 'c)src1 = string;
   type ('a, 'b, 'c)src2 = string;
 
@@ -59,8 +58,8 @@ structure Expr :> EXPR = struct
 
   and 'a expr = Expr of primExpr
 
-  fun Int n = Expr (ConstInt n);
-  fun Real n = Expr (ConstReal n);
+  fun IntC n = Expr (ConstInt n);
+  fun RealC n = Expr (ConstReal n);
   fun Add (Expr x) (Expr y) = Expr (BinExpr (OpAdd, x, y));
   fun Sub (Expr x) (Expr y) = Expr (BinExpr (OpSub, x, y));
   fun Mul (Expr x) (Expr y) = Expr (BinExpr (OpMul, x, y));
@@ -103,14 +102,14 @@ structure Expr :> EXPR = struct
       | expr (ConstReal r) = Real.toString r
       | expr (UnExpr (ope, e)) = unop ope e
       | expr (BinExpr (ope, e1, e2)) = binop ope e1 e2
-      | expr (Buf1Expr i) = "buf0[" ^ indexStr i ^ "]"
-      | expr (Buf2Expr i) = "buf1[" ^ indexStr i ^ "]"
+      | expr (Buf1Expr i) = "buf1[" ^ indexStr i ^ "]"
+      | expr (Buf2Expr i) = "buf2[" ^ indexStr i ^ "]"
 
-    fun clType RealT n = "__global const double* buf" ^ Int.toString n ^ ",\n"
-      | clType IntT n = "__global const int* buf" ^ Int.toString n ^ ",\n";
+    fun clType Real n = "__global const double* buf" ^ Int.toString n ^ ",\n"
+      | clType Int n = "__global const int* buf" ^ Int.toString n ^ ",\n";
 
-    fun rType RealT = "__global const double* bufr) {\n"
-      | rType IntT = "__global const int* bufr) {\n";
+    fun rType Real = "__global const double* bufr) {\n"
+      | rType Int = "__global const int* bufr) {\n";
 
     fun expr1 f t1 r s =
         case f (Buf1 t1) of
@@ -124,7 +123,7 @@ structure Expr :> EXPR = struct
               val src = src1toString(expr1 f t1 r s)
           in
               "#pragma OPENCL EXTENSION cl_khr_fp64 : enable\n __kernel void "
-              ^ s ^ "(\n" ^ clType t1 0 ^ rType r
+              ^ s ^ "(\n" ^ clType t1 1 ^ rType r
               ^ "int iGID = get_global_id(0);\nbufr[iGID] = " ^ src ^ ";\n}\n"
           end;
       fun compile2 f (t1, t2) r s =
