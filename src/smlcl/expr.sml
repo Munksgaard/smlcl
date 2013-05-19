@@ -28,9 +28,10 @@ signature EXPR = sig
   val IntToReal : int expr -> real expr;
   val RealToInt : real expr -> int expr;
 
-  val compile1 : ((index -> 'a expr) -> 'r expr) -> 'a T -> 'r T -> string -> ('a, 'c)src1;
-  val compile2 : ((index -> 'a expr) * (index -> 'b expr) -> 'r expr) -> ('a T * 'b T) -> 'r T
-                 -> string -> ('a, 'b, 'r)src2;
+  val compile1 : ((index -> 'a expr) -> 'r expr) -> 'a T -> 'r T -> string
+                 -> ('a, 'r)src1;
+  val compile2 : ((index -> 'a expr) * (index -> 'b expr) -> 'r expr)
+                 -> ('a T * 'b T) -> 'r T -> string -> ('a, 'b, 'r)src2;
 
   val src1toString : ('a, 'b)src1 -> string;
   val src2toString : ('a, 'b, 'c)src2 -> string;
@@ -108,19 +109,29 @@ structure Expr :> EXPR = struct
     fun rType RealT = "__global const double* bufr) {\n"
       | rType IntT = "__global const int* bufr) {\n";
 
+    fun expr1 f t1 r s =
+        case f (Buf1 t1) of
+            Expr e => expr e
+    fun expr2 f (t1, t2) r s =
+        case f (Buf1 t1, Buf2 t2) of
+            Expr e => expr e
   in
       fun compile1 f t1 r s =
-          case f (Buf1 t1) of
-              Expr e =>  "#pragma OPENCL EXTENSION cl_khr_fp64 : enable\n __kernel void "
-                        ^ s ^ "(" ^ clType t1 0 ^ rType r
-                        ^ "int iGID = get_global_id(0);\nbufr[iGID] = "
-                        ^ expr e ^ ";\n}\n"
+          let
+              val src = src1toString(expr1 f t1 r s)
+          in
+              "#pragma OPENCL EXTENSION cl_khr_fp64 : enable\n __kernel void "
+              ^ s ^ "(\n" ^ clType t1 0 ^ rType r
+              ^ "int iGID = get_global_id(0);\nbufr[iGID] = " ^ src ^ ";\n}\n"
+          end;
       fun compile2 f (t1, t2) r s =
-          case f (Buf1 t1, Buf2 t2) of
-              Expr e => "#pragma OPENCL EXTENSION cl_khr_fp64 : enable\n __kernel void "
-                        ^ s ^ "(" ^ clType t1 0 ^ clType t2 1 ^ rType r
-                        ^ "int iGID = get_global_id(0);\nbufr[iGID] = "
-                        ^ expr e ^ ";\n}\n"
+          let
+              val src = src2toString(expr2 f (t1, t2) r s)
+          in
+              "#pragma OPENCL EXTENSION cl_khr_fp64 : enable\n __kernel void "
+              ^ s ^ "(\n" ^ clType t1 0 ^ clType t1 1 ^ rType r
+              ^ "int iGID = get_global_id(0);\nbufr[iGID] = " ^ src ^ ";\n}\n"
+          end;
   end;
 
   fun src1toString src = src;
