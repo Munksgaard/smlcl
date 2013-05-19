@@ -79,6 +79,9 @@ structure Expr :> EXPR = struct
 
   fun parens s = "(" ^ s ^ ")"
 
+  fun src1toString src = src;
+  fun src2toString src = src;
+
   local
     fun indexStr This = "iGID"
       | indexStr (Index n) = Int.toString n
@@ -133,8 +136,5 @@ structure Expr :> EXPR = struct
               ^ "int iGID = get_global_id(0);\nbufr[iGID] = " ^ src ^ ";\n}\n"
           end;
   end;
-
-  fun src1toString src = src;
-  fun src2toString src = src;
 
 end;
