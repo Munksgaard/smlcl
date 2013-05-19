@@ -131,7 +131,7 @@ structure Expr :> EXPR = struct
               val src = src2toString(expr2 f (t1, t2) r s)
           in
               "#pragma OPENCL EXTENSION cl_khr_fp64 : enable\n __kernel void "
-              ^ s ^ "(\n" ^ clType t1 0 ^ clType t1 1 ^ rType r
+              ^ s ^ "(\n" ^ clType t1 0 ^ clType t2 1 ^ rType r
               ^ "int iGID = get_global_id(0);\nbufr[iGID] = " ^ src ^ ";\n}\n"
           end;
   end;
