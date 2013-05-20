@@ -1,0 +1,66 @@
+\documentclass[a4paper, 10pt]{article}
+
+\usepackage[utf8x]{inputenc}
+\usepackage[english]{babel}
+\usepackage{fancyhdr}
+\usepackage{hyperref}
+\usepackage{url}
+\usepackage{graphicx}
+\usepackage{ku-forside}
+\usepackage{xcolor, colortbl}
+%\usepackage{cite}
+\usepackage{url, hyperref}
+\usepackage{amsmath}
+\usepackage[numbers]{natbib}
+
+%\setlength\parskip{1em}
+%\setlength{\parindent}{0pt}
+\def\arraystretch{2}
+
+\fancyhead[LO,RE]{smlcl \\ }
+\fancyhead[LE,RO]{Philip Munksgaard \\ \today}
+\pagestyle{fancy}
+
+\titel{smlcl}
+\undertitel{An ML library for utilizing parallel architectures using OpenCL}
+\opgave{Bachelorprojekt}
+\forfatter{\shortstack[l]{P. Munksgaard (240789)}}
+\dato{\today}
+\vejleder{M. Elsman}
+
+\newcommand{\conc}{\, \| \,}
+\newcommand{\how}[1]{\text{[#1]}}
+
+\begin{document}
+\maketitle
+\newpage
+\tableofcontents
+\newpage
+
+\input{introduction}
+
+\input{problemdesc}
+
+\input{motivation}
+
+\input{gpu}
+
+\input{abstractionlayers}
+
+\input{typesafety}
+
+\input{mapreduce}
+
+\input{related}
+
+\input{future}
+
+\input{conclusion}
+
+\newpage
+
+\bibliographystyle{plainnat}
+
+\bibliography{references}
+
+\end{document}
