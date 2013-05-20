@@ -16,9 +16,7 @@ val b2 = mkBuf m Real (Array.fromList [9.0, 5.0, 7.0]);
 val a2 = fromBuf b2;
 printRList (rarr2list a2);
 
-val vectoradd_src = TextIO.inputAll (TextIO.openIn "vectoradd.cl")
-
-val k = mkKern2 m "VectorAdd" ("", Real) ("", Real) ("", Real) vectoradd_src;
+val k = mkKern2 m "VectorAdd" (fn (b1, b2) => b1 This) (Real, Real) Real;
 
 val rbuf = kcall2 k (b1, b2) 3;
 
