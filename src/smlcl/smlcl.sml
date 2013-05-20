@@ -10,7 +10,7 @@ structure Smlcl : SMLCL = struct
                            * (machine * sz * 'a buffP -> 'a array)
                            * (machine * 'a buffP * 'a array -> bool);
   type 'a buf = 'a T * sz * 'a buffP * machine;
-  type ('a1, 'a2, 'r)kern2 = machine * MLton.Pointer.t * string * 'r * string;
+  type ('a1, 'a2, 'r)kern2 = machine * MLton.Pointer.t * string * 'r T * string;
 
   type ('a, 'c)src1 = string;
   type ('a, 'b, 'c)src2 = string;

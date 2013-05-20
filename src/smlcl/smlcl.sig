@@ -36,8 +36,8 @@ signature SMLCL = sig
   val init : unit -> machine;
 
   val mkKern2 : machine -> string -> ((index -> 'a expr) * (index -> 'b expr)
-                                      -> 'r T expr)
-                -> ('a T * 'b T) -> 'r T -> ('a,'b,'r T)kern2;
+                                      -> 'r expr)
+                -> ('a T * 'b T) -> 'r T -> ('a,'b,'r)kern2;
 
   val mkBuf : machine -> 'a T -> 'a array -> 'a buf;
 
@@ -45,7 +45,7 @@ signature SMLCL = sig
 
   val toBuf : 'a array -> 'a buf -> 'a buf
 
-  val kcall2 : ('a T, 'b T, 'c T)kern2 -> ('a buf * 'b buf) -> int
+  val kcall2 : ('a, 'b, 'c)kern2 -> ('a buf * 'b buf) -> int
                -> 'c buf;
 
   val compile1 : ((index -> 'a expr) -> 'r expr) -> 'a T -> 'r T -> string
