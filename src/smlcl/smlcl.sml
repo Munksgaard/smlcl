@@ -10,9 +10,7 @@ structure Smlcl : SMLCL = struct
                            * (machine * sz * 'a buffP -> 'a array)
                            * (machine * 'a buffP * 'a array -> bool);
   type 'a buf = 'a T * sz * 'a buffP * machine;
-  type ('a1, 'a2, 'r)kern2 = machine * MLton.Pointer.t * string
-                             * (string * 'a1) * (string * 'a2)
-                             * (string * 'r) * string;
+  type ('a1, 'a2, 'r)kern2 = machine * MLton.Pointer.t * string * 'r * string;
 
   type ('a, 'c)src1 = string;
   type ('a, 'b, 'c)src2 = string;
@@ -122,14 +120,6 @@ structure Smlcl : SMLCL = struct
   val compile = _import "cSclCompile" : MLton.Pointer.t * string * string
                                         -> MLton.Pointer.t;
 
-  fun mkKern2 m name (a1,b1) (a2, b2) (rname, r) src =
-      let val k = compile (m, name, src) in
-          if k = MLton.Pointer.null then
-              raise OpenCL
-          else
-              (m, k, name, (a1,b1), (a2,b2), (rname,r), src)
-      end;
-
   val mkBufEmpty = _import "cSclCreateBuffer" : MLton.Pointer.t * int * int
                                                 * MLton.Pointer.t
                                                 -> MLton.Pointer.t;
@@ -142,7 +132,7 @@ structure Smlcl : SMLCL = struct
                                        * MLton.Pointer.t
                                        * MLton.Pointer.t -> bool;
 
-  fun kcall2 (m, k, name, _, _, (r, rt), src)
+  fun kcall2 (m, k, name, rt, src)
              ((t1, sz1, bp1, _), (t2, sz2, bp2, _))
              worksize =
       case rt of
@@ -232,5 +222,17 @@ structure Smlcl : SMLCL = struct
               ^ "int iGID = get_global_id(0);\nbufr[iGID] = " ^ src ^ ";\n}\n"
           end;
   end;
+
+
+  fun mkKern2 m name f (t1, t2) rt =
+      let val src = compile2 f (t1, t2) rt name
+          val k = compile (m, name, src)
+      in
+          if k = MLton.Pointer.null then
+              raise OpenCL
+          else
+              (m, k, name, rt, src)
+      end;
+
 
 end;

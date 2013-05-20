@@ -4,25 +4,6 @@ signature SMLCL = sig
   type 'a buf;
   type ('a1, 'a2, 'r)kern2
 
-  exception OpenCL
-
-  val Int : int T;
-  val Real : real T;
-
-  val init : unit -> machine;
-
-  val mkKern2 : machine -> string -> (string*'a) -> (string * 'b)
-                -> (string * 'c) -> string -> ('a,'b,'c)kern2;
-
-  val mkBuf : machine -> 'a T -> 'a array -> 'a buf;
-
-  val fromBuf : 'a buf -> 'a array;
-
-  val toBuf : 'a array -> 'a buf -> 'a buf
-
-  val kcall2 : ('a T, 'b T, 'c T)kern2 -> ('a buf * 'b buf) -> int
-               -> 'c buf;
-
   type ('a, 'c)src1;
   type ('a, 'b, 'c)src2;
 
@@ -46,6 +27,26 @@ signature SMLCL = sig
 
   val IntToReal : int expr -> real expr;
   val RealToInt : real expr -> int expr;
+
+  exception OpenCL
+
+  val Int : int T;
+  val Real : real T;
+
+  val init : unit -> machine;
+
+  val mkKern2 : machine -> string -> ((index -> 'a expr) * (index -> 'b expr)
+                                      -> 'r T expr)
+                -> ('a T * 'b T) -> 'r T -> ('a,'b,'r T)kern2;
+
+  val mkBuf : machine -> 'a T -> 'a array -> 'a buf;
+
+  val fromBuf : 'a buf -> 'a array;
+
+  val toBuf : 'a array -> 'a buf -> 'a buf
+
+  val kcall2 : ('a T, 'b T, 'c T)kern2 -> ('a buf * 'b buf) -> int
+               -> 'c buf;
 
   val compile1 : ((index -> 'a expr) -> 'r expr) -> 'a T -> 'r T -> string
                  -> ('a, 'r)src1;
