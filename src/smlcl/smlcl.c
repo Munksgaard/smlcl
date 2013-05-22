@@ -8,7 +8,7 @@
 
 #include <simplecl.h>
 
-Pointer cSclInit() {
+Pointer init() {
   int err = SIMPLECL_SUCCESS;
 
   simplecl_machine machine = sclInit(&err);
@@ -21,7 +21,7 @@ Pointer cSclInit() {
   }
 }
 
-Pointer cSclCompile(Pointer p, char * name, char * src) {
+Pointer compile(Pointer p, char * name, char * src) {
   int err = SIMPLECL_SUCCESS;
 
   simplecl_machine machine = (simplecl_machine)p;
@@ -35,7 +35,7 @@ Pointer cSclCompile(Pointer p, char * name, char * src) {
   }
 }
 
-Pointer cSclCreateBuffer(Pointer p1,
+Pointer createBuffer(Pointer p1,
                          int type_size,
                          int size,
                          Pointer p2) {
@@ -45,7 +45,7 @@ Pointer cSclCreateBuffer(Pointer p1,
 }
 
 /* Should only be called with a read or read-write buffer */
-Bool cSclReadBuffer(Pointer p1 /* simplecl_machine */,
+Bool readBuffer(Pointer p1 /* simplecl_machine */,
                     int type_size,
                     int size,
                     Pointer p2 /* buffer */,
@@ -64,7 +64,7 @@ Bool cSclReadBuffer(Pointer p1 /* simplecl_machine */,
 }
 
 /* Should only be called with a write or read-write buffer */
-Bool cSclWriteBuffer(Pointer p_machine /* simplecl_machine */,
+Bool writeBuffer(Pointer p_machine /* simplecl_machine */,
                      int type_size,
                      Pointer p_buffer /* buffer to read from */,
                      Pointer p_array /* array to read to */) {
@@ -83,7 +83,7 @@ Bool cSclWriteBuffer(Pointer p_machine /* simplecl_machine */,
 }
 
 
-Bool cSclRun1(Pointer p_machine,
+Bool run1(Pointer p_machine,
                 Pointer p_kernel,
                 Int32 worksize,
                 Pointer inputp,
@@ -111,7 +111,7 @@ Bool cSclRun1(Pointer p_machine,
   }
 }
 
-Bool cSclRun2(Pointer p_machine,
+Bool run2(Pointer p_machine,
                 Pointer p_kernel,
                 Int32 worksize,
                 Pointer inputp_1,
@@ -142,7 +142,7 @@ Bool cSclRun2(Pointer p_machine,
   }
 }
 
-Bool cSclFreeBuffer(Pointer p_buffer) {
+Bool freeBuffer(Pointer p_buffer) {
   if (sclFreeBuffer((cl_mem)p_buffer) != SIMPLECL_SUCCESS) {
     return 0;
   } else {
@@ -150,7 +150,7 @@ Bool cSclFreeBuffer(Pointer p_buffer) {
   }
 }
 
-Bool cSclCleanupKernel(Pointer p_kernel) {
+Bool cleanupKernel(Pointer p_kernel) {
   if (sclCleanupKernel((simplecl_kernel)p_kernel) != SIMPLECL_SUCCESS) {
     return 0;
   } else {
@@ -158,7 +158,7 @@ Bool cSclCleanupKernel(Pointer p_kernel) {
   }
 }
 
-Bool cSclCleanupMachine(Pointer p_machine) {
+Bool cleanupMachine(Pointer p_machine) {
   if (sclCleanupMachine((simplecl_machine)p_machine) != SIMPLECL_SUCCESS) {
     return 0;
   } else {
