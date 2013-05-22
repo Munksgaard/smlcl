@@ -124,7 +124,7 @@ structure Smlcl : SMLCL = struct
                                                 * MLton.Pointer.t
                                                 -> MLton.Pointer.t;
 
-  val kcall2_ = _import "cSclRun2_1" : MLton.Pointer.t * MLton.Pointer.t
+  val kcall2_ = _import "cSclRun2" : MLton.Pointer.t * MLton.Pointer.t
                                        * int * MLton.Pointer.t
                                        * MLton.Pointer.t
                                        * MLton.Pointer.t -> bool;

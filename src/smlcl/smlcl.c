@@ -35,70 +35,13 @@ Pointer cSclCompile(Pointer p, char * name, char * src) {
   }
 }
 
-Bool cSclSetArg(Pointer p1,
-                int index,
-                int size,
-                void * arg) {
-  simplecl_kernel kernel = (simplecl_kernel)p1;
-  
-  int err;
-  err = sclSetArg(kernel, index, size, arg);
-  if (err != SIMPLECL_SUCCESS) {
-    printf("SetArg failed\n");
-    return 0;
-  } else {
-    return 1;
-  }
-}
-
-
 Pointer cSclCreateBuffer(Pointer p1,
                          int type_size,
                          int size,
                          Pointer p2) {
   simplecl_machine machine = (simplecl_machine)p1;
   void * arr = (void*)p2;
-  return (Pointer)sclCreateReadWriteBuffer(machine, size, (size_t)type_size, arr);
-}
-
-Pointer cSclCreateReadBuffer(Pointer p1 /* simplecl_machine */,
-                             int type_size /* size of elements in array */,
-                             Pointer p2 /* array to fill buffer with */) {
-  simplecl_machine machine = (simplecl_machine)p1;
-  void * arr = (void*)p2;
-  int size = (int)GC_getArrayLength(p2);
-
-  return (Pointer)sclCreateReadBuffer(machine, size, (size_t)type_size, arr);
-}
-
-Pointer cSclMakeBuffer(Pointer p1 /* simplecl_machine */,
-                       int type_size  /* size of elements in array */,
-                       Pointer p2 /* array to fill buffer with */) {
-  simplecl_machine machine = (simplecl_machine)p1;
-  void * arr = (void*)p2;
-  int size = (int)GC_getArrayLength(p2);
-
-  return (Pointer)sclCreateReadWriteBuffer(machine, size, (size_t)type_size, arr);
-}
-
-Pointer cSclCreateWriteBuffer(Pointer p1 /* simplecl_machine */,
-                              int type_size /* size of each element */,
-                              int size /* number of elements */) {
-  simplecl_machine machine = (simplecl_machine)p1;
-  return (Pointer)sclCreateWriteBuffer((simplecl_machine)machine,
-                                       size,
-                                       (size_t)type_size);
-}
-
-/* Always creates an empty read-write buffer */
-Pointer cSclCreateReadWriteBuffer(Pointer p1 /* simplecl_machine */,
-                                  int type_size,
-                                  int size /* number of elements */) {
-  simplecl_machine machine = (simplecl_machine)p1;
-  return (Pointer)sclCreateReadWriteBuffer((simplecl_machine)machine,
-                                           size,
-                                           (size_t)type_size,
-                                           NULL);
+  return (Pointer)sclCreateBuffer(machine, size, (size_t)type_size, arr);
 }
 
 /* Should only be called with a read or read-write buffer */
@@ -140,7 +83,7 @@ Bool cSclWriteBuffer(Pointer p_machine /* simplecl_machine */,
 }
 
 
-Bool cSclRun1_1(Pointer p_machine,
+Bool cSclRun1(Pointer p_machine,
                 Pointer p_kernel,
                 Int32 worksize,
                 Pointer inputp,
@@ -154,7 +97,7 @@ Bool cSclRun1_1(Pointer p_machine,
 
   int err;
 
-  err = sclRun1_1(machine,
+  err = sclRun1(machine,
                   kernel,
                   worksize,
                   input,
@@ -168,7 +111,7 @@ Bool cSclRun1_1(Pointer p_machine,
   }
 }
 
-Bool cSclRun2_1(Pointer p_machine,
+Bool cSclRun2(Pointer p_machine,
                 Pointer p_kernel,
                 Int32 worksize,
                 Pointer inputp_1,
@@ -184,78 +127,11 @@ Bool cSclRun2_1(Pointer p_machine,
 
   int err;
 
-  err = sclRun2_1(machine,
+  err = sclRun2(machine,
                   kernel,
                   worksize,
                   input_1,
                   input_2,
-                  output);
-
-  if (err != SIMPLECL_SUCCESS) {
-    printf("Run failed\n");
-    return 0;
-  } else {
-    return 1;
-  }
-}
-
-Bool cSclRun2_2(Pointer p_machine,
-                Pointer p_kernel,
-                Int32 worksize,
-                Pointer inputp_1,
-                Pointer inputp_2,
-                Pointer outputp_1,
-                Pointer outputp_2) {
-  simplecl_machine machine = (simplecl_machine)p_machine;
-  simplecl_kernel kernel = (simplecl_kernel)p_kernel;
-
-  cl_mem input_1 = (cl_mem)inputp_1;
-  cl_mem input_2 = (cl_mem)inputp_2;
-
-  cl_mem output_1 = (cl_mem)outputp_1;
-  cl_mem output_2 = (cl_mem)outputp_2;
-
-  int err;
-
-  err = sclRun2_2(machine,
-                  kernel,
-                  worksize,
-                  input_1,
-                  input_2,
-                  output_1,
-                  output_2);
-
-  if (err != SIMPLECL_SUCCESS) {
-    printf("Run failed\n");
-    return 0;
-  } else {
-    return 1;
-  }
-}
-
-Bool cSclRun3_1(Pointer p_machine,
-                Pointer p_kernel,
-                Int32 worksize,
-                Pointer inputp_1,
-                Pointer inputp_2,
-                Pointer inputp_3,
-                Pointer outputp) {
-  simplecl_machine machine = (simplecl_machine)p_machine;
-  simplecl_kernel kernel = (simplecl_kernel)p_kernel;
-
-  cl_mem input_1 = (cl_mem)inputp_1;
-  cl_mem input_2 = (cl_mem)inputp_2;
-  cl_mem input_3 = (cl_mem)inputp_3;
-  cl_mem output = (cl_mem)outputp;
-
-  int err;
-
-  err = sclRun3_1(machine,
-                  kernel,
-                  worksize,
-                  input_1,
-                  input_2,
-                  input_3,
                   output);
 
   if (err != SIMPLECL_SUCCESS) {
