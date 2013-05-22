@@ -192,8 +192,8 @@ structure Smlcl : SMLCL = struct
     fun clType (Real_ _) n = "__global const double* buf" ^ Int.toString n ^ ",\n"
       | clType (Int_ _) n = "__global const int* buf" ^ Int.toString n ^ ",\n";
 
-    fun rType (Real_ _) = "__global const double* bufr) {\n"
-      | rType (Int_ _) = "__global const int* bufr) {\n";
+    fun rType (Real_ _) = "__global double* bufr) {\n"
+      | rType (Int_ _) = "__global int* bufr) {\n";
 
     fun expr1 f t1 r s =
         case f (Buf1 t1) of
