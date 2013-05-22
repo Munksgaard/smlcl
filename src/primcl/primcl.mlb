@@ -1,0 +1,13 @@
+ann
+  "allowFFI true"
+in
+  local
+    $(SML_LIB)/basis/basis.mlb
+    $(SML_LIB)/basis/mlton.mlb
+    primcl.sig
+    primcl.sml
+  in
+    signature PRIMCL
+    structure PrimCL
+  end
+end

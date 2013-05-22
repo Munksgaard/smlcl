@@ -5,7 +5,8 @@ all : smlcl
 
 smlcl : smlcl.mlb smlcl.sml smlcl.sig
 	make -C $(SIMPLECL)
-	mlton -show-basis .tmpbasis -default-ann 'allowFFI true' -link-opt -lsimplecl -link-opt -L$(SIMPLECL) -cc-opt -I$(SIMPLECL) -cc-opt -I$(CUDA)/include/ smlcl.mlb smlcl.c
+	make -C $(PRIMCL)
+	mlton -show-basis .tmpbasis -default-ann 'allowFFI true' -link-opt -lsimplecl -link-opt -L$(SIMPLECL) -cc-opt -I$(SIMPLECL) -cc-opt -I$(CUDA)/include/ smlcl.mlb
 	cat .tmpbasis
 	rm .tmpbasis
 
