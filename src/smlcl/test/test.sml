@@ -4,7 +4,7 @@ val iarr2list : int array -> int list = Array.foldr (fn (x, xs) => x :: xs) []
 val printRList = app (fn x => print ((Real.toString x) ^ "\n"))
 val printIList = app (fn x => print ((Int.toString x) ^ "\n"))
 
-open Smlcl
+open SmlCL
 
 val m = init ();
 val b1 = mkBuf m Real (Array.fromList [1.0, 2.0, 3.0]);

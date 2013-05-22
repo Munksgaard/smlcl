@@ -1,4 +1,4 @@
-structure Smlcl : SMLCL = struct
+structure SmlCL : SMLCL = struct
 
   type machine = PrimCL.machine;
   type kernel = PrimCL.kernel;

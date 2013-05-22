@@ -6,5 +6,5 @@ local
   smlcl.sml
 in
   signature SMLCL
-  structure Smlcl
+  structure SmlCL
 end
