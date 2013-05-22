@@ -113,7 +113,11 @@ power, special care must be taken when programming for the GPU. We
 have to efficiently divide the work into parts, distribute them across
 groups and cores, make sure that cores do not overwrite the work of
 each other, synchronize results and so on. Luckily, frameworks, such
-as \emph{OpenCL}, can help us with these tasks.
+as \emph{OpenCL}, can help us with these tasks~\footnote{CUDA is
+  another popular framework, specifically for programming NVIDIA
+  GPUs. While Smlcl will focus on GPU programming, we also want to
+  allow other GPUs than NVIDIAs, which is why we've chosen to work
+  with OpenCL}.
 
 \subsection{OpenCL}
 
@@ -140,8 +144,11 @@ this memory). Each kernel also has a unique global ID, a work group
 ID, and a unique ID within it's work group.
 
 The host code, typically written in C or C++~\cite{hostlang}, uses the
-OpenCL API to set up the OpenCL environment, select a device to ,
+OpenCL API to set up the OpenCL environment for a specific device,
 compile and build the kernel code, transfer data to buffers on the
 device, execute the kernels and read the results back from the
 buffers. Appendix \ref{vectoradd}, shows the code required to
-calculate the addition of two vectors.
+calculate the addition of two vectors. As it can be seen, even
+executing a rather simple computation like a vector addition, takes
+many steps, and there is a high risk of introducing errors when
+writing the code, simply because of the complexity of the process.
