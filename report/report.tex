@@ -1,0 +1,95 @@
+\documentclass[a4paper, 10pt]{article}
+
+\usepackage[utf8x]{inputenc}
+\usepackage[english]{babel}
+\usepackage{fancyhdr}
+\usepackage{hyperref}
+\usepackage{url}
+\usepackage{graphicx}
+\usepackage{ku-forside}
+\usepackage{xcolor, colortbl}
+%\usepackage{cite}
+\usepackage{url, hyperref}
+\usepackage{amsmath}
+\usepackage[numbers]{natbib}
+\usepackage{listings}
+\usepackage{courier}
+
+%\setlength\parskip{1em}
+%\setlength{\parindent}{0pt}
+\def\arraystretch{2}
+
+\fancyhead[LO,RE]{Smlcl \\ }
+\fancyhead[LE,RO]{Philip Munksgaard \\ \today}
+\pagestyle{fancy}
+
+\titel{Smlcl}
+\undertitel{An ML library for utilizing parallel architectures using OpenCL}
+\opgave{Bachelorprojekt}
+\forfatter{\shortstack[l]{P. Munksgaard (240789)}}
+\dato{\today}
+\vejleder{M. Elsman}
+
+\newcommand{\conc}{\, \| \,}
+\newcommand{\how}[1]{\text{[#1]}}
+
+\lstset{
+  basicstyle=\footnotesize\ttfamily, % Standardschrift
+  numbers=left,               % Ort der Zeilennummern
+  numberstyle=\tiny,          % Stil der Zeilennummern
+  %stepnumber=2,               % Abstand zwischen den Zeilennummern
+  numbersep=5pt,              % Abstand der Nummern zum Text
+  tabsize=2,                  % Groesse von Tabs
+  extendedchars=true,         %
+  breaklines=true,            % Zeilen werden Umgebrochen
+  %         keywordstyle=\color{red},
+  frame=single,
+  %        keywordstyle=[1]\textbf,    % Stil der Keywords
+  %        keywordstyle=[2]\textbf,    %
+  %        keywordstyle=[3]\textbf,    %
+  %        keywordstyle=[4]\textbf,   \sqrt{\sqrt{}} %
+  stringstyle=\color{white}\ttfamily, % Farbe der String
+  showspaces=false,           % Leerzeichen anzeigen ?
+  showtabs=false,             % Tabs anzeigen ?
+  xleftmargin=17pt,
+  framexleftmargin=17pt,
+  framexrightmargin=5pt,
+  framexbottommargin=4pt,
+  %backgroundcolor=\color{lightgray},
+  showstringspaces=false,      % Leerzeichen in Strings anzeigen ?
+  captionpos=b
+}
+
+\begin{document}
+\maketitle
+\newpage
+\tableofcontents
+\newpage
+
+\input{introduction}
+
+\input{problemdesc}
+
+\input{motivation}
+
+\input{gpu}
+
+\input{abstractionlayers}
+
+\input{typesafety}
+
+\input{mapreduce}
+
+\input{related}
+
+\input{future}
+
+\input{conclusion}
+
+\newpage
+
+\bibliographystyle{plainnat}
+
+\bibliography{references}
+
+\end{document}
