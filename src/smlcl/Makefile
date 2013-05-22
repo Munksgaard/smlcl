@@ -10,8 +10,8 @@ smlcl : smlcl.mlb smlcl.sml smlcl.sig
 	cat .tmpbasis
 	rm .tmpbasis
 
-.PHONY: run
-run :
+.PHONY: test
+test :
 	make -C test run
 
 .PHONY: clean
