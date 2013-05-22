@@ -139,13 +139,9 @@ can access the same memory) or private (no other kernel can access
 this memory). Each kernel also has a unique global ID, a work group
 ID, and a unique ID within it's work group.
 
-The host code, which can be written in a variety of languages, though
-official releases only support C/C++~\cite{hostlang}, uses the OpenCL
-API to set up the OpenCL environment, compile and build the kernel
-code, transfer data to buffers on the device, execute the kernels and
-read the results back from the buffers.
-
-\lstinputlisting[language=C,caption=vectoradd.cl - OpenCL code for
-  adding two vectors,label=vectoradd.cl]{code/vectoradd.cl}
-\lstinputlisting[language=C,caption=host.c - Host code for
-  vectoradd,label=vectoradd.cl]{code/host.c}
+The host code, typically written in C or C++~\cite{hostlang}, uses the
+OpenCL API to set up the OpenCL environment, select a device to ,
+compile and build the kernel code, transfer data to buffers on the
+device, execute the kernels and read the results back from the
+buffers. Appendix \ref{vectoradd}, shows the code required to
+calculate the addition of two vectors.
