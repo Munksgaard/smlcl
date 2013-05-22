@@ -1,15 +1,18 @@
 include Makefile.inc
 
-.PHONY: all
+.PHONY: all, clean, test, run
 all : 
 	make -C $(SIMPLECL)
+	make -C $(PRIMCL)
 	make -C $(SMLCL)
 
-run : all
-	make -C $(SMLCL)/test run
+test : all
+	make -C $(SIMPLECL) test
+	make -C $(PRIMCL) test
+	make -C $(SMLCL) test
 
-.PHONY: clean
 clean :
 	make -C $(SMLCL) clean
+	make -C $(PRIMCL) clean
 	make -C $(SIMPLECL) clean
 

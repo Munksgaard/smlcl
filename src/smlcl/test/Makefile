@@ -6,7 +6,7 @@ all : test
 test : vectoradd.cl test.sml
 	make -C $(SIMPLECL)
 	make -C $(SMLCL)
-	mlton -link-opt -lsimplecl -link-opt -L$(SIMPLECL) -cc-opt -I$(SIMPLECL) -cc-opt -I$(CUDA)/include/ test.mlb $(SMLCL)/smlcl.c
+	mlton -link-opt -lsimplecl -link-opt -L$(SIMPLECL) -cc-opt -I$(SIMPLECL) -cc-opt -I$(CUDA)/include/ test.mlb $(PRIMCL)/primcl.c
 
 .PHONY: run
 run : test

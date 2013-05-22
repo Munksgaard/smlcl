@@ -1,5 +1,9 @@
 CUDA=/home/pmunksgaard/.local/cuda-5.0
 
-SIMPLECL=/home/pmunksgaard/src/smlcl/src/simplecl
+SMLCL_ROOT=/home/pmunksgaard/src/smlcl/src
 
-SMLCL=/home/pmunksgaard/src/smlcl/src/smlcl
+SIMPLECL=${SMLCL_ROOT}/simplecl
+
+PRIMCL=${SMLCL_ROOT}/primcl
+
+SMLCL=${SMLCL_ROOT}/smlcl

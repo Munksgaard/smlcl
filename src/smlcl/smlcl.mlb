@@ -1,13 +1,10 @@
-ann
-  "allowFFI true"
+local
+  $(SML_LIB)/basis/basis.mlb
+  $(SML_LIB)/basis/mlton.mlb
+  ../primcl/primcl.mlb
+  smlcl.sig
+  smlcl.sml
 in
-  local
-    $(SML_LIB)/basis/basis.mlb
-    $(SML_LIB)/basis/mlton.mlb
-    smlcl.sig
-    smlcl.sml
-  in
-    signature SMLCL
-    structure Smlcl
-  end
+  signature SMLCL
+  structure SmlCL
 end
