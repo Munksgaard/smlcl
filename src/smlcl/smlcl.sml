@@ -34,7 +34,7 @@ structure Smlcl : SMLCL = struct
 
   exception OpenCL;
 
-  val init_ = _import "cSclInit" : unit -> MLton.Pointer.t;
+  val init_ = _import "init" : unit -> MLton.Pointer.t;
   fun init () = let val machine = init_ ();
                 in if machine = MLton.Pointer.null then
                        raise OpenCL
@@ -46,10 +46,10 @@ structure Smlcl : SMLCL = struct
   val realSize = 8;
 
   val mkBufInt =
-      _import "cSclCreateBuffer" : MLton.Pointer.t * int * int
+      _import "createBuffer" : MLton.Pointer.t * int * int
                                    * int array -> MLton.Pointer.t;
   val mkBufReal =
-      _import "cSclCreateBuffer" : MLton.Pointer.t * int * int
+      _import "createBuffer" : MLton.Pointer.t * int * int
                                    * real array -> MLton.Pointer.t;
 
   fun intArr2buf (m, arr) =
@@ -58,10 +58,10 @@ structure Smlcl : SMLCL = struct
       mkBufReal (m, realSize, Array.length arr, arr);
 
   val fromIntBuf =
-      _import "cSclReadBuffer" : MLton.Pointer.t * int * int
+      _import "readBuffer" : MLton.Pointer.t * int * int
                                  * MLton.Pointer.t * int array -> bool;
   val fromRealBuf =
-      _import "cSclReadBuffer" : MLton.Pointer.t * int * int
+      _import "readBuffer" : MLton.Pointer.t * int * int
                                  * MLton.Pointer.t * real array -> bool;
   fun intBuf2arr (m, n, b) =
       let val arr = Array.array(n, 0) in
@@ -80,11 +80,11 @@ structure Smlcl : SMLCL = struct
       end;
 
   val toRealBuf =
-      _import "cSclWriteBuffer" : MLton.Pointer.t * int *
+      _import "writeBuffer" : MLton.Pointer.t * int *
                                   MLton.Pointer.t * real array -> bool;
 
   val toIntBuf =
-      _import "cSclWriteBuffer" : MLton.Pointer.t * int *
+      _import "writeBuffer" : MLton.Pointer.t * int *
                                   MLton.Pointer.t * int array -> bool;
 
   val Int = Int_(intArr2buf, intBuf2arr,
@@ -117,14 +117,14 @@ structure Smlcl : SMLCL = struct
       else
           raise Fail "buffer not big enough";
 
-  val compile = _import "cSclCompile" : MLton.Pointer.t * string * string
+  val compile = _import "compile" : MLton.Pointer.t * string * string
                                         -> MLton.Pointer.t;
 
-  val mkBufEmpty = _import "cSclCreateBuffer" : MLton.Pointer.t * int * int
+  val mkBufEmpty = _import "createBuffer" : MLton.Pointer.t * int * int
                                                 * MLton.Pointer.t
                                                 -> MLton.Pointer.t;
 
-  val kcall2_ = _import "cSclRun2_1" : MLton.Pointer.t * MLton.Pointer.t
+  val kcall2_ = _import "run2" : MLton.Pointer.t * MLton.Pointer.t
                                        * int * MLton.Pointer.t
                                        * MLton.Pointer.t
                                        * MLton.Pointer.t -> bool;
