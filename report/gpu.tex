@@ -148,7 +148,41 @@ OpenCL API to set up the OpenCL environment for a specific device,
 compile and build the kernel code, transfer data to buffers on the
 device, execute the kernels and read the results back from the
 buffers. Appendix \ref{vectoradd}, shows the code required to
-calculate the addition of two vectors. As it can be seen, even
-executing a rather simple computation like a vector addition, takes
-many steps, and there is a high risk of introducing errors when
-writing the code, simply because of the complexity of the process.
+calculate the addition of two vectors. In short, the steps required
+are:
+
+\begin{enumerate}
+  \item Get the \texttt{cl\_platform\_id} for the platform that we
+    want to work with.
+  \item Get the \texttt{cl\_device\_id} the device that we want to
+    work with.
+  \item Create a \texttt{cl\_context} for the device and platform
+    chosen. \emph{Contexts} are used by the OpenCL runtime to manage
+    command-queues, memory, program, and kernel objects, as well as
+    for executing kernels.
+  \item Create a \texttt{cl\_command\_queue} using the context
+    created. When a command is to be executed on the device, it is put
+    in the command queue, from whence the OpenCL runtime will
+    execute it in order.
+  \item Create a \texttt{cl\_program} from source code using the
+    context obtained above. A \emph{program} is a collection of
+    kernels, which may also contain auxiliary functions and constant
+    data.
+  \item Compile and link (called building) the program obtained in the
+    previous step.
+  \item Create a \texttt{cl\_kernel} from one of the kernels in a
+    given program. A \emph{kernel} is the bit of code that is to be
+    executed on the device.
+  \item Create appropriate buffers (\texttt{cl\_mem} objects) for
+    input and output.
+  \item Write input data to the input buffers.
+  \item Set arguments for the kernel created above. These can be input
+    buffers, or scalars like an \texttt{int}.
+  \item Put the kernel in the command-queue to execute it.
+  \item Read the contents of the output buffer(s).
+\end{enumerate}
+
+As it can be seen, even executing a rather simple computation, like a
+vector addition, takes many steps, and there is a high risk of
+introducing errors when writing the code, simply because of the
+complexity of the process.
