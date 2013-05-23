@@ -14,3 +14,37 @@ ML, to SimpleCL. Building on top of SmlCL, we've added the ability to
 safely generate typed kernels and execute them in a type safe manner.
 
 \subsection{SimpleCL}
+
+While we've choosen to focus our development efforts on interfacing
+with OpenCL from MLton, we wanted to make it easy to use SmlCL from
+other implementations of Standard ML as well. Thus, instead of
+implementing a complete interface from Standard ML to the OpenCL API,
+the first step was to create SimpleCL, a simplified OpenCL API in C,
+that could hide some of the complexities of the OpenCL framework.
+
+In its current form, SimpleCL provides the following interface:
+
+\begin{itemize}
+  \item \texttt{sclInit}: Returns a \texttt{simplecl\_machine},
+    which is a struct containing a \texttt{cl\_machine} and a
+    \texttt{cl\_context}, or \texttt{null} on error.
+  \item \texttt{sclCompile}: Is used to compile source code into
+    an OpenCL kernel. Returns a \texttt{simplecl\_kernel}, which is a
+    struct containing a \texttt{cl\_kernel} and a
+    \texttt{cl\_program}, or \texttt{null} on error.
+  \item \texttt{sclCreateBuffer}: Creates a read-write buffer,
+    optionally filled with the contents of \texttt{array}.
+  \item \texttt{sclReadBuffer}: Read the contents of a buffer into an
+    array.
+  \item \texttt{sclWriteBuffer}: Write the contents of an array into a
+    buffer.
+  \item \texttt{sclRun1}: Run a kernel with one input buffer and one
+    output buffer.
+  \item \texttt{sclRun2}: Run a kernel with two input buffers and one
+    output buffer.
+  \item \texttt{sclFreeBuffer}: Frees a buffer from memory.
+  \item \texttt{sclCleanupKernel}: Cleans up a kernel and frees it
+    from memory.
+  \item \texttt{sclCleanupMachine}: Cleans up a machine and frees it
+    from memory.
+\end{itemize}
