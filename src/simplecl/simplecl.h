@@ -23,9 +23,9 @@ simplecl_kernel sclCompile(simplecl_machine machine,
 /* Creates a read-write buffer on the device.
    If array != NULL fills the buffer with the contents of array */
 simplecl_buffer sclCreateBuffer(simplecl_machine machine,
-                                         int size,
-                                         size_t type_size,
-                                         void * array);
+                                int size,
+                                size_t type_size,
+                                void * array);
 
 /* Reads the contents of buffer into array.
    Returns SIMPLECL_SUCCESS on success and SIMPLECL_FAILURE otherwise */
@@ -43,17 +43,17 @@ int sclWriteBuffer(simplecl_machine machine,
                    void * array);
 
 int sclRun1(simplecl_machine machine,
-              simplecl_kernel kernel,
-              const size_t work_size,
-              simplecl_buffer input,
-              simplecl_buffer output);
+            simplecl_kernel kernel,
+            const size_t work_size,
+            simplecl_buffer input,
+            simplecl_buffer output);
 
 int sclRun2(simplecl_machine machine,
-              simplecl_kernel kernel,
-              const size_t work_size,
-              simplecl_buffer input_1,
-              simplecl_buffer input_2,
-              simplecl_buffer output);
+            simplecl_kernel kernel,
+            const size_t work_size,
+            simplecl_buffer input_1,
+            simplecl_buffer input_2,
+            simplecl_buffer output);
 
 /* Frees a buffer from the device */
 int sclFreeBuffer(simplecl_buffer buffer);

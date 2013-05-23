@@ -99,9 +99,9 @@ simplecl_kernel sclCompile(simplecl_machine machine, const char * name, const ch
 }
 
 simplecl_buffer sclCreateBuffer(simplecl_machine machine,
-                                         int size,
-                                         size_t type_size,
-                                         void * array) {
+                                int size,
+                                size_t type_size,
+                                void * array) {
   int err = CL_SUCCESS;
 
   cl_mem buffer;
@@ -189,10 +189,10 @@ int sclWriteBuffer(simplecl_machine machine,
 }
 
 int sclRun1(simplecl_machine machine,
-              simplecl_kernel kernel,
-              const size_t work_size,
-              simplecl_buffer input,
-              simplecl_buffer output) {
+            simplecl_kernel kernel,
+            const size_t work_size,
+            simplecl_buffer input,
+            simplecl_buffer output) {
 
   int err = CL_SUCCESS;
 
@@ -223,11 +223,11 @@ int sclRun1(simplecl_machine machine,
 }
 
 int sclRun2(simplecl_machine machine,
-              simplecl_kernel kernel,
-              const size_t work_size,
-              simplecl_buffer input_1,
-              simplecl_buffer input_2,
-              simplecl_buffer output) {
+            simplecl_kernel kernel,
+            const size_t work_size,
+            simplecl_buffer input_1,
+            simplecl_buffer input_2,
+            simplecl_buffer output) {
 
   int err = CL_SUCCESS;
 
