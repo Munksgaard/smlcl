@@ -20,7 +20,7 @@ signature PRIMCL = sig
   val init : unit -> machine option;
   val compile : machine * string * string -> kernel option
 
+  val kcall1 : machine * kernel * int * bufP * bufP -> bool;
   val kcall2 : machine * kernel * int * bufP * bufP * bufP -> bool;
-
 
 end;
