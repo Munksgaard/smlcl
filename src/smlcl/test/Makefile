@@ -10,7 +10,7 @@ test : vectoradd.cl test.sml
 
 .PHONY: run
 run : test
-	LD_LIBRARY_PATH=$(SIMPLECL):$LD_LIBRARY_PATH ./test
+	LD_LIBRARY_PATH=$(SIMPLECL):$(LD_LIBRARY_PATH) ./test
 
 .PHONY: clean
 clean :
