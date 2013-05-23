@@ -23,4 +23,8 @@ signature PRIMCL = sig
   val kcall1 : machine * kernel * int * bufP * bufP -> bool;
   val kcall2 : machine * kernel * int * bufP * bufP * bufP -> bool;
 
+  val freeBuf : bufP -> bool;
+  val cleanKern : kernel -> bool;
+  val cleanMachine : machine -> bool;
+
 end;

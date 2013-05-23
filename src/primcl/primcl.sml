@@ -52,4 +52,8 @@ structure PrimCL :> PRIMCL = struct
   val kcall2 = _import "run2" : machine * kernel * int * bufP * bufP
                                 * bufP -> bool;
 
+  val freeBuf = _import "freeBuffer" : bufP -> bool;
+  val cleanKern = _import "cleanupKernel" : kernel -> bool;
+  val cleanMachine = _import "cleanupMachine" : machine -> bool;
+
 end;
