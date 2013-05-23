@@ -9,6 +9,10 @@ primcl : primcl.mlb primcl.sml primcl.sig
 	cat .tmpbasis
 	rm .tmpbasis
 
+.PHONY: test
+test : primcl
+	make -C test run
+
 .PHONY: clean
 clean :
 	rm -f primcl .tmpbasis
