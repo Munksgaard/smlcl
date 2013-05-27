@@ -11,6 +11,8 @@ structure SmlCL :> SMLCL = struct
                            * (machine * sz * 'a bufP -> 'a array)
                            * (machine * 'a bufP * 'a array -> bool);
   type 'a buf = 'a T * sz * 'a bufP * machine;
+
+  type ('a, 'r)kern1 = machine * kernel * string * 'r T * string;
   type ('a1, 'a2, 'r)kern2 = machine * kernel * string * 'r T * string;
 
   type ('a, 'c)src1 = string;
@@ -97,6 +99,17 @@ structure SmlCL :> SMLCL = struct
 
   val mkBufEmpty = PrimCL.mkBufEmpty;
 
+  fun kcall1 (m, k, name, rt, src) (t1, sz1, bp1, _) worksize =
+      case rt of
+          Int_ (_, _, _) => let val rbuf = mkBufEmpty (m, PrimCL.intSize,
+                                                       worksize);
+                             val _ = PrimCL.kcall1 (m, k, worksize, bp1, rbuf)
+                         in (rt, worksize, rbuf, m) end
+        | Real_ (_, _, _) => let val rbuf = mkBufEmpty (m, PrimCL.realSize,
+                                                        worksize);
+                              val _ = PrimCL.kcall1 (m, k, worksize, bp1, rbuf)
+                          in (rt, worksize, rbuf, m) end;
+
   fun kcall2 (m, k, name, rt, src)
              ((t1, sz1, bp1, _), (t2, sz2, bp2, _))
              worksize =
@@ -174,7 +187,7 @@ structure SmlCL :> SMLCL = struct
           let
               val src = src1toString(expr1 f t1 r s)
           in
-              "#pragma OPENCL EXTENSION cl_khr_fp64 : enable\n __kernel void "
+              "#pragma OPENCL EXTENSION cl_khr_fp64 : enable\n__kernel void "
               ^ s ^ "(\n" ^ clType t1 1 ^ rType r
               ^ "int iGID = get_global_id(0);\nbufr[iGID] = " ^ src ^ ";\n}\n"
           end;
@@ -182,12 +195,20 @@ structure SmlCL :> SMLCL = struct
           let
               val src = src2toString(expr2 f (t1, t2) r s)
           in
-              "#pragma OPENCL EXTENSION cl_khr_fp64 : enable\n __kernel void "
+              "#pragma OPENCL EXTENSION cl_khr_fp64 : enable\n__kernel void "
               ^ s ^ "(\n" ^ clType t1 1 ^ clType t2 2 ^ rType r
               ^ "int iGID = get_global_id(0);\nbufr[iGID] = " ^ src ^ ";\n}\n"
           end;
   end;
 
+  fun mkKern1 m name f t1 rt =
+      let val src = compile1 f t1 rt name
+          val k = PrimCL.compile (m, name, src)
+      in
+          case k of
+              NONE => raise OpenCL
+            | SOME x => (m, x, name, rt, src)
+      end;
 
   fun mkKern2 m name f (t1, t2) rt =
       let val src = compile2 f (t1, t2) rt name
