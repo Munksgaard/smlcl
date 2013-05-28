@@ -33,22 +33,31 @@
 \newcommand{\conc}{\, \| \,}
 \newcommand{\how}[1]{\text{[#1]}}
 
+\definecolor{mygreen}{rgb}{0,0.6,0}
+\definecolor{mygray}{rgb}{0.5,0.5,0.5}
+\definecolor{mymauve}{rgb}{0.58,0,0.82}
+
 \lstset{
   basicstyle=\footnotesize\ttfamily, % Standardschrift
   numbers=left,               % Ort der Zeilennummern
-  numberstyle=\tiny,          % Stil der Zeilennummern
+  numberstyle=\tiny\color{mygray},% Stil der Zeilennummern
   %stepnumber=2,               % Abstand zwischen den Zeilennummern
   numbersep=5pt,              % Abstand der Nummern zum Text
   tabsize=2,                  % Groesse von Tabs
   extendedchars=true,         %
   breaklines=true,            % Zeilen werden Umgebrochen
+  breakatwhitespace=true,
+  commentstyle=\color{mygreen},    % comment style
+  keywordstyle=\color{blue},       % keyword style
+  rulecolor=\color{black},
+  stringstyle=\color{mymauve},     % string literal style
   %         keywordstyle=\color{red},
-  frame=single,
+  frame=L,
   %        keywordstyle=[1]\textbf,    % Stil der Keywords
   %        keywordstyle=[2]\textbf,    %
   %        keywordstyle=[3]\textbf,    %
   %        keywordstyle=[4]\textbf,   \sqrt{\sqrt{}} %
-  stringstyle=\color{white}\ttfamily, % Farbe der String
+  stringstyle=\color{red}\ttfamily, % Farbe der String
   showspaces=false,           % Leerzeichen anzeigen ?
   showtabs=false,             % Tabs anzeigen ?
   xleftmargin=17pt,
