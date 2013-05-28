@@ -1,1 +1,80 @@
 \section{Future Work and Extensions}
+\label{futurework}
+
+The current implementation of SmlCL represents an initial
+implementation of a Standard ML interface to OpenCL, that tries to
+keep within the functional paradigms of SML, while allowing users to
+take advantage of some of the capabailities of modern GPUs. While it
+achieves many of its goals by being easy and safe to use, it does not
+yet take full advantage of OpenCL and its capabilities, and thus there
+is still plenty of room for improvements.
+
+A relatively simple addition to the current interface would be to
+allow for additional types of buffers and values. Right now, SmlCL
+only supports buffers and constants of type \texttt{int} and
+\texttt{real} (\texttt{int} and \texttt{double} in C,
+respectively). Although C does not have native support for boolean
+values like \texttt{true} and \texttt{false}, it does support boolean
+logic, simply by regarding the number $0$ as false, and everything
+else as true.  Support for SML characters like \texttt{\#"a"} could
+also be added rather easily, since for most cases they share the same
+representation in Standard ML and C. Strings could also be passed
+rather easily, but you would need to take special care not to allow
+any overflows, since different SML implementations have different
+representations of strings (they are not null terminated in MLton, for
+example). However, adding support for tuples and datatypes is not very
+feasible; MLton does not even allow passing datatypes or tuples to C
+functions, and it would needlessly complicate kernels as well.
+
+Another trivial extension to SmlCL would be to add more versions of
+\texttt{mkKern} and \texttt{kcall}, each allowing a different amount
+of buffer arguments. You would need to add run functions to all the
+layers of SmlCL, including PrimCL and SimpleCL, but the
+implementations would be more or less identical to the already
+existing run functions.
+
+SmlCL currently only supports passing buffers as arguments to
+kernels. A nice addition would be to allow users to pass regular
+scalars like integers or reals. However, this poses several problems
+for the implementation: firstly, we would need to extend the function
+definitions of \texttt{kcall1} and \texttt{kcall2} to allow not only
+buffers, but also integers and reals as arguments. Sadly, this is not
+easily possible using the current way we execute functions: we would
+need to add some datatypes to manage the different types of arguments,
+and we would have to add a lot of foreign function calls for each
+composition of argument types. Another way to achieve this would be to
+refactor the code, such that we had functions like:
+
+\begin{lstlisting}[language=ML,mathescape]
+  val setArgBuf : kernel -> int -> 'a buf -> unit;
+  val setArgReal : kernel -> int -> real -> unit;
+  val setArgInt : kernel -> int -> int -> unit;
+\end{lstlisting}
+
+That is, we manually set the kernel arguments on the SML side, instead
+of letting the C-side handle them.
+
+We could also extend our interface to OpenCL, allowing users to
+specify work-group sizes, adding support for OpenCL vectors, using
+kernels that have been compiled offline, use CPUs in addition to GPUs,
+and much more. OpenCL is very complex, and has many options for
+customization of execution and how to run your programs. However, we
+feel that many of these additions would work counter to our goals of a
+simplified API that hides some of this complexity in order to provide
+ease-of-use. It would however enable users to better take advantage of
+the capabilities of OpenCL, and if a suitable compromise could be
+found, it could facilitate more efficient parallel processing.
+
+Finally, we could extend the expression generator, in order to allow
+the construction of more complex kernels, including additional
+constructions like \texttt{if}-statements, \texttt{for} and
+\texttt{while} loops, auxiliary functions, global constants, local and
+private variables, and so forth. This could be done in a number of
+ways, one could either provide sufficient constructs such that our
+expression interface mimics OpenCL C, or one could keep a functional
+approach and add more constructs like \texttt{Map} and \texttt{Fold},
+\texttt{let} statements, and the like to the language. Either way, the
+more advanced we want our kernel expression language to be, the closer
+we get to writing a complete compiler for a new language. For this
+project, we have therefore chosen to keep it relatively simple, in
+order to make sure that kernels execute correctly and efficiently.
