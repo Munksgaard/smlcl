@@ -30,6 +30,7 @@ signature SMLCL = sig
   val kcall2 : ('a, 'b, 'r)kern2 -> ('a buf * 'b buf) -> int -> 'r buf;
 
   val map : ((index -> 'a expr) -> 'r expr) -> 'a buf -> 'r T -> 'r buf;
+  val red : ('a expr * 'r expr -> 'r expr) -> 'r expr -> 'a buf -> 'r T -> 'r;
 
   val This : index;
   val Index : int expr -> index;

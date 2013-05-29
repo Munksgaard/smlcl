@@ -25,6 +25,7 @@ structure SmlCL :> SMLCL = struct
                     | ConstReal of real
                     | Buf1Expr of index
                     | Buf2Expr of index
+                    | Variable of string
 
        and triOp = OpIf
 
@@ -153,6 +154,7 @@ structure SmlCL :> SMLCL = struct
   fun IntToReal (Expr x) = Expr (UnExpr (OpIntToReal, x));
   fun RealToInt (Expr x) = Expr (UnExpr (OpRealToInt, x));
 
+  fun Var s = Expr (Variable s)
   fun Buf1 (_: 'a T) i : 'a expr = Expr (Buf1Expr i);
   fun Buf2 (_: 'a T) i : 'a expr = Expr (Buf2Expr i);
 
@@ -188,6 +190,7 @@ structure SmlCL :> SMLCL = struct
       | expr (TriExpr (ope, c, e1, e2)) = triop ope c e1 e2
       | expr (Buf1Expr i) = "buf1[" ^ indexStr i ^ "]"
       | expr (Buf2Expr i) = "buf2[" ^ indexStr i ^ "]"
+      | expr (Variable s) = " " ^ s ^ " "
 
     fun clType (Real_ _) n = "__global const double* buf" ^ Int.toString n ^ ",\n"
       | clType (Int_ _) n = "__global const int* buf" ^ Int.toString n ^ ",\n";
@@ -206,17 +209,60 @@ structure SmlCL :> SMLCL = struct
           let
               val src = expr1 f t1 r s
           in
-              "#pragma OPENCL EXTENSION cl_khr_fp64 : enable\n__kernel void "
-              ^ s ^ "(\n" ^ clType t1 1 ^ rType r
+              "#pragma OPENCL EXTENSION cl_khr_fp64 : enable\n"
+              ^ "\n"
+              ^ "__kernel void " ^ s ^ "(\n " ^ clType t1 1 ^ rType r
               ^ "int iGID = get_global_id(0);\nbufr[iGID] = " ^ src ^ ";\n}\n"
           end;
       fun compile2 f (t1, t2) r s =
           let
               val src = expr2 f (t1, t2) r s
           in
-              "#pragma OPENCL EXTENSION cl_khr_fp64 : enable\n__kernel void "
-              ^ s ^ "(\n" ^ clType t1 1 ^ clType t2 2 ^ rType r
+              "#pragma OPENCL EXTENSION cl_khr_fp64 : enable\n"
+              ^ "__kernel void " ^ s ^ "(\n" ^ clType t1 1 ^ clType t2 2 ^ rType r
               ^ "int iGID = get_global_id(0);\nbufr[iGID] = " ^ src ^ ";\n}\n"
+          end;
+
+      fun red f a (b as (t1, n, _, m)) rt =
+          let val exp = case f (Buf1 t1 (Index (Var "i")), Var "acc") of
+                            Expr e => expr e;
+              val acc = case a of
+                            Expr e => expr e;
+              val src = "#pragma OPENCL EXTENSION cl_khr_fp64 : enable\n"
+                        ^ "\n"
+                        ^ "__kernel void reduce(" ^ clType t1 1
+                        ^ "                     " ^ clType Int 2
+                        ^ "                     " ^ rType rt
+                        ^ "  int length = buf2[0];\n"
+                        ^ "  int iGID = get_global_id(0);\n"
+                        ^ "  int global_size = get_global_size(0);\n"
+                        ^ "\n"
+                        ^ "  int i;\n"
+                        ^ "\n"
+                        ^ "  double acc = " ^ acc ^ ";\n"
+                        ^ "  for (i=iGID; i<length; i = i + global_size) {\n"
+                        ^ "    acc = " ^ exp ^ ";\n"
+                        ^ "  }\n"
+                        ^ "  bufr[iGID] = acc;\n"
+                        ^ "\n"
+                        ^ "  barrier(CLK_GLOBAL_MEM_FENCE);\n"
+                        ^ "\n"
+                        ^ "  acc = " ^ acc ^ ";\n"
+                        ^ "  if (get_global_id(0) == 0) {\n"
+                        ^ "    for (i=0; i<length && i<global_size; i++) {\n"
+                        ^ "      acc = " ^ exp ^ ";\n"
+                        ^ "    }\n"
+                        ^ "    bufr[0] = acc;\n"
+                        ^ "  }\n"
+                        ^ "}\n\n";
+              val k = case PrimCL.compile (m, "reduce", src) of
+                          NONE => raise OpenCL
+                        | SOME x => (m, x, "reduce", rt, src);
+              val lenb = mkBuf m Int (Array.fromList [n]);
+              val rbuf = kcall2 k (b, lenb) 256;
+              val arr = readBuf rbuf;
+          in
+              Array.sub (arr, 0)
           end;
   end;
 

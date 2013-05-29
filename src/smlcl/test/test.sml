@@ -37,3 +37,5 @@ val b5 = (writeBuf (Array.fromList [11.0, 12.0, 13.0, 14.0]) rbuf;
 print (kern2src k);
 
 printIList (iarr2list (readBuf (map (fn b => Mul (IntC 2) (b This)) (mkBuf m Int (Array.fromList [42,43,44,54])) Int)));
+
+print (Int.toString (red (fn (x, a) => If (Gt x a) x a) (IntC 0) (mkBuf m Int (Array.fromList [1,2,3,4])) Int) ^ "\n");
