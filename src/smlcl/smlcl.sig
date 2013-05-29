@@ -27,7 +27,7 @@ signature SMLCL = sig
   val writeBuf : 'a array -> 'a buf -> 'a buf;
 
   val kcall1 : ('a, 'r)kern1 -> 'a buf -> int -> 'r buf;
-  val kcall2 : ('a, 'b, 'c)kern2 -> ('a buf * 'b buf) -> int -> 'c buf;
+  val kcall2 : ('a, 'b, 'r)kern2 -> ('a buf * 'b buf) -> int -> 'r buf;
 
   val This : index;
   val Index : int expr -> index;
