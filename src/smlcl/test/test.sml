@@ -34,5 +34,4 @@ printRList (rarr2list a4);
 val b5 = (writeBuf (Array.fromList [11.0, 12.0, 13.0, 14.0]) rbuf;
           print "This shouldn't happen\n") handle Fail _ => print "yes\n";
 
-print (src2toString (compile2 (fn (b1,b2) => Add (IntToReal(b1 This)) (b2 This))
-                              (Int, Real) Real "VectorAdd"));
+print (kern2src k);

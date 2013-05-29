@@ -153,9 +153,6 @@ structure SmlCL :> SMLCL = struct
 
   fun parens s = "(" ^ s ^ ")"
 
-  fun src1toString src = src;
-  fun src2toString src = src;
-
   local
     fun indexStr This = "iGID"
       | indexStr (OpIndex e) = expr e
@@ -198,7 +195,7 @@ structure SmlCL :> SMLCL = struct
   in
       fun compile1 f t1 r s =
           let
-              val src = src1toString(expr1 f t1 r s)
+              val src = expr1 f t1 r s
           in
               "#pragma OPENCL EXTENSION cl_khr_fp64 : enable\n__kernel void "
               ^ s ^ "(\n" ^ clType t1 1 ^ rType r
@@ -206,7 +203,7 @@ structure SmlCL :> SMLCL = struct
           end;
       fun compile2 f (t1, t2) r s =
           let
-              val src = src2toString(expr2 f (t1, t2) r s)
+              val src = expr2 f (t1, t2) r s
           in
               "#pragma OPENCL EXTENSION cl_khr_fp64 : enable\n__kernel void "
               ^ s ^ "(\n" ^ clType t1 1 ^ clType t2 2 ^ rType r
@@ -232,5 +229,7 @@ structure SmlCL :> SMLCL = struct
             | SOME x => (m, x, name, rt, src)
       end;
 
+  fun kern1src (_, _, _, _, src) = src;
+  fun kern2src (_, _, _, _, src) = src;
 
 end;

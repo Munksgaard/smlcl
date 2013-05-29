@@ -52,13 +52,7 @@ signature SMLCL = sig
   val IntToReal : int expr -> real expr;
   val RealToInt : real expr -> int expr;
 
-  type ('a, 'c)src1;
-  type ('a, 'b, 'c)src2;
-  val compile1 : ((index -> 'a expr) -> 'r expr) -> 'a T -> 'r T -> string
-                 -> ('a, 'r)src1;
-  val compile2 : ((index -> 'a expr) * (index -> 'b expr) -> 'r expr)
-                 -> ('a T * 'b T) -> 'r T -> string -> ('a, 'b, 'r)src2;
-  val src1toString : ('a, 'r)src1 -> string;
-  val src2toString : ('a, 'b, 'r)src2 -> string;
+  val kern1src : ('a, 'c)kern1 -> string;
+  val kern2src : ('a, 'b, 'c)kern2 -> string;
 
 end;
