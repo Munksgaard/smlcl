@@ -30,8 +30,8 @@ signature SMLCL = sig
   val kcall2 : ('a, 'b, 'c)kern2 -> ('a buf * 'b buf) -> int -> 'c buf;
 
   val This : index;
-  val Index : int -> index;
-  val Offset : int -> index;
+  val Index : int expr -> index;
+  val Offset : int expr -> index;
 
   val IntC : int -> int expr;
   val RealC : real -> real expr;
@@ -40,10 +40,14 @@ signature SMLCL = sig
   val Mul : 'a expr -> 'a expr -> 'a expr;
   val Div : 'a expr -> 'a expr -> 'a expr;
 
+  val True : bool expr;
+  val False : bool expr;
   val Eq : 'a expr -> 'a expr -> bool expr;
   val And : bool expr -> bool expr -> bool expr;
   val Or : bool expr -> bool expr -> bool expr;
   val Not : bool expr -> bool expr;
+
+  val If : bool expr -> 'a expr -> 'a expr -> 'a expr;
 
   val IntToReal : int expr -> real expr;
   val RealToInt : real expr -> int expr;

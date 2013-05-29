@@ -18,22 +18,25 @@ structure SmlCL :> SMLCL = struct
   type ('a, 'c)src1 = string;
   type ('a, 'b, 'c)src2 = string;
 
-  datatype index = This
-                 | Index of int
-                 | Offset of int;
-
-  datatype primExpr = BinExpr of binOp * primExpr * primExpr
+  datatype primExpr = TriExpr of triOp * primExpr * primExpr * primExpr
+                    | BinExpr of binOp * primExpr * primExpr
                     | UnExpr of unOp * primExpr
                     | ConstInt of int
                     | ConstReal of real
                     | Buf1Expr of index
                     | Buf2Expr of index
 
+       and triOp = OpIf
+
        and binOp = OpEq | OpAnd | OpAdd | OpSub | OpMul | OpDiv | OpOr
 
        and unOp = OpNot | OpIntToReal | OpRealToInt
 
-       and 'a expr = Expr of primExpr;
+       and 'a expr = Expr of primExpr
+
+       and index = This
+                 | OpIndex of primExpr
+                 | OpOffset of primExpr
 
   exception OpenCL;
 
@@ -123,6 +126,9 @@ structure SmlCL :> SMLCL = struct
                               val _ = PrimCL.kcall2 (m, k, worksize, bp1, bp2, rbuf)
                           in (rt, worksize, rbuf, m) end;
 
+  fun Index (Expr e) = OpIndex e;
+  fun Offset (Expr e) = OpOffset e;
+
   fun IntC n = Expr (ConstInt n);
   fun RealC n = Expr (ConstReal n);
   fun Add (Expr x) (Expr y) = Expr (BinExpr (OpAdd, x, y));
@@ -130,10 +136,14 @@ structure SmlCL :> SMLCL = struct
   fun Mul (Expr x) (Expr y) = Expr (BinExpr (OpMul, x, y));
   fun Div (Expr x) (Expr y) = Expr (BinExpr (OpDiv, x, y));
 
+  val True = Expr (ConstInt 1);
+  val False = Expr (ConstInt 0);
   fun And (Expr x) (Expr y) = Expr (BinExpr (OpAnd, x, y));
   fun Or (Expr x) (Expr y) = Expr (BinExpr (OpOr, x, y));
   fun Eq (Expr x) (Expr y) = Expr (BinExpr (OpEq, x, y));
   fun Not (Expr x) = Expr (UnExpr (OpNot, x));
+
+  fun If (Expr x) (Expr y) (Expr z) = Expr (TriExpr (OpIf, x, y, z));
 
   fun IntToReal (Expr x) = Expr (UnExpr (OpIntToReal, x));
   fun RealToInt (Expr x) = Expr (UnExpr (OpRealToInt, x));
@@ -148,10 +158,10 @@ structure SmlCL :> SMLCL = struct
 
   local
     fun indexStr This = "iGID"
-      | indexStr (Index n) = Int.toString n
-      | indexStr (Offset n) = "iGID + " ^ Int.toString n;
+      | indexStr (OpIndex e) = expr e
+      | indexStr (OpOffset e) = "iGID + " ^ expr e
 
-    fun unop OpNot e = "!" ^ parens (expr e)
+    and unop OpNot e = "!" ^ parens (expr e)
       | unop OpIntToReal e = "(real)" ^ parens (expr e)
       | unop OpRealToInt e = "(int)" ^ parens (expr e)
 
@@ -163,10 +173,13 @@ structure SmlCL :> SMLCL = struct
       | binop OpMul e1 e2 = parens (expr e1 ^ " * " ^ expr e2)
       | binop OpDiv e1 e2 = parens (expr e1 ^ " / " ^ expr e2)
 
+    and triop OpIf c e1 e2 = parens (expr c ^ " ? " ^ expr e1 ^ " : " ^ expr e2)
+
     and expr (ConstInt n) = Int.toString n
       | expr (ConstReal r) = Real.toString r
       | expr (UnExpr (ope, e)) = unop ope e
       | expr (BinExpr (ope, e1, e2)) = binop ope e1 e2
+      | expr (TriExpr (ope, c, e1, e2)) = triop ope c e1 e2
       | expr (Buf1Expr i) = "buf1[" ^ indexStr i ^ "]"
       | expr (Buf2Expr i) = "buf2[" ^ indexStr i ^ "]"
 
