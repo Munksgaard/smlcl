@@ -48,6 +48,10 @@ signature SMLCL = sig
   val And : bool expr -> bool expr -> bool expr;
   val Or : bool expr -> bool expr -> bool expr;
   val Not : bool expr -> bool expr;
+  val Lt : 'a expr -> 'a expr -> bool expr;
+  val Gt : 'a expr -> 'a expr -> bool expr;
+  val Leq : 'a expr -> 'a expr -> bool expr;
+  val Geq : 'a expr -> 'a expr -> bool expr;
 
   val If : bool expr -> 'a expr -> 'a expr -> 'a expr;
 

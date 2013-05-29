@@ -28,7 +28,8 @@ structure SmlCL :> SMLCL = struct
 
        and triOp = OpIf
 
-       and binOp = OpEq | OpAnd | OpAdd | OpSub | OpMul | OpDiv | OpOr
+       and binOp = OpEq | OpAnd | OpAdd | OpSub | OpMul | OpDiv | OpOr | OpLt
+                   | OpGt | OpLeq | OpGeq
 
        and unOp = OpNot | OpIntToReal | OpRealToInt
 
@@ -142,6 +143,10 @@ structure SmlCL :> SMLCL = struct
   fun Or (Expr x) (Expr y) = Expr (BinExpr (OpOr, x, y));
   fun Eq (Expr x) (Expr y) = Expr (BinExpr (OpEq, x, y));
   fun Not (Expr x) = Expr (UnExpr (OpNot, x));
+  fun Lt (Expr x) (Expr y) = Expr (BinExpr (OpLt, x, y));
+  fun Gt (Expr x) (Expr y) = Expr (BinExpr (OpGt, x, y));
+  fun Leq (Expr x) (Expr y) = Expr (BinExpr (OpLeq, x, y));
+  fun Geq (Expr x) (Expr y) = Expr (BinExpr (OpGeq, x, y));
 
   fun If (Expr x) (Expr y) (Expr z) = Expr (TriExpr (OpIf, x, y, z));
 
@@ -169,6 +174,10 @@ structure SmlCL :> SMLCL = struct
       | binop OpSub e1 e2 = parens (expr e1 ^ " - " ^ expr e2)
       | binop OpMul e1 e2 = parens (expr e1 ^ " * " ^ expr e2)
       | binop OpDiv e1 e2 = parens (expr e1 ^ " / " ^ expr e2)
+      | binop OpLt e1 e2 = parens (expr e1 ^ " < " ^ expr e2)
+      | binop OpGt e1 e2 = parens (expr e1 ^ " > " ^ expr e2)
+      | binop OpLeq e1 e2 = parens (expr e1 ^ " <= " ^ expr e2)
+      | binop OpGeq e1 e2 = parens (expr e1 ^ " >= " ^ expr e2)
 
     and triop OpIf c e1 e2 = parens (expr c ^ " ? " ^ expr e1 ^ " : " ^ expr e2)
 
