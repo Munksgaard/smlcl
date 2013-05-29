@@ -47,7 +47,7 @@ structure PrimCL :> PRIMCL = struct
                           SOME k
                   end;
 
-  val kcall1 = _import "run2" : machine * kernel * int * bufP * bufP -> bool;
+  val kcall1 = _import "run1" : machine * kernel * int * bufP * bufP -> bool;
 
   val kcall2 = _import "run2" : machine * kernel * int * bufP * bufP
                                 * bufP -> bool;
