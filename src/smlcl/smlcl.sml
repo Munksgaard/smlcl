@@ -232,4 +232,8 @@ structure SmlCL :> SMLCL = struct
   fun kern1src (_, _, _, _, src) = src;
   fun kern2src (_, _, _, _, src) = src;
 
+  fun map f (b as (t1, n, _ , m)) t2 =
+      let val k = mkKern1 m "Map" f t1 t2
+      in kcall1 k b n end;
+
 end;

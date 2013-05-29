@@ -35,3 +35,5 @@ val b5 = (writeBuf (Array.fromList [11.0, 12.0, 13.0, 14.0]) rbuf;
           print "This shouldn't happen\n") handle Fail _ => print "yes\n";
 
 print (kern2src k);
+
+printIList (iarr2list (readBuf (map (fn b => Mul (IntC 2) (b This)) (mkBuf m Int (Array.fromList [42,43,44,54])) Int)));
