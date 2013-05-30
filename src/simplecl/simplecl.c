@@ -67,14 +67,14 @@ simplecl_kernel sclCompile(simplecl_machine machine, const char * name, const ch
 
   cl_program program = clCreateProgramWithSource(machine->context, 1, &src, &tmp, &err);
   if (err != CL_SUCCESS) {
-    printf("Error in clCreateProgramWithSource, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
+    printf("Error %d in clCreateProgramWithSource, Line %u in file %s !!!\n\n", err, __LINE__, __FILE__);
     *return_err = SIMPLECL_FAILURE;
     return NULL;
   }
 
   err = clBuildProgram(program, 0, NULL, 0, NULL, NULL);
   if (err != CL_SUCCESS) {
-    printf("Error in clBuildProgram, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
+    printf("Error %d in clBuildProgram, Line %u in file %s !!!\n\n", err, __LINE__, __FILE__);
     printf("The error is: %d\n\n", (int) err);
     printf("The source code is:\n%s\n\n", src);
     *return_err = SIMPLECL_FAILURE;
