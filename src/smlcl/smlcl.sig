@@ -62,4 +62,9 @@ signature SMLCL = sig
   val kern1src : ('a, 'c)kern1 -> string;
   val kern2src : ('a, 'b, 'c)kern2 -> string;
 
+  val freeBuf : 'a buf -> unit;
+  val cleanKern1 : ('a, 'b)kern1 -> unit;
+  val cleanKern2 : ('a, 'b, 'c)kern2 -> unit;
+  val cleanMachine : machine -> unit;
+
 end;

@@ -123,6 +123,11 @@ structure SmlCL :> SMLCL = struct
                               val _ = PrimCL.kcall1 (m, k, worksize, bp1, rbuf)
                           in (rt, worksize, rbuf, m) end;
 
+  fun freeBuf (_, _, b, m) = if PrimCL.freeBuf b then
+                                 ()
+                             else
+                                 raise Fail "Error trying to free buffer";
+
   fun kcall2 (m, k, name, rt, src)
              ((t1, sz1, bp1, _), (t2, sz2, bp2, _))
              worksize =
@@ -302,5 +307,20 @@ structure SmlCL :> SMLCL = struct
   fun map f (b as (t1, n, _ , m)) t2 =
       let val k = mkKern1 m "Map" f t1 t2
       in kcall1 k b n end;
+
+  fun cleanKern1 (_, k, _, _ ,_) =
+      if PrimCL.cleanKern k
+      then ()
+      else raise Fail "Error trying to cleanup kernel";
+
+  fun cleanKern2 (_, k, _, _ ,_) =
+      if PrimCL.cleanKern k
+      then ()
+      else raise Fail "Error trying to cleanup kernel";
+
+  fun cleanMachine m =
+      if PrimCL.cleanMachine m
+      then ()
+      else raise Fail "Error trying to cleanup machine";
 
 end;
