@@ -16,3 +16,4 @@ test : primcl
 .PHONY: clean
 clean :
 	rm -f primcl .tmpbasis
+	make -C test clean

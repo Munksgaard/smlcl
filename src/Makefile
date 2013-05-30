@@ -6,7 +6,7 @@ all :
 	make -C $(PRIMCL)
 	make -C $(SMLCL)
 
-test : all
+test : clean all
 	make -C $(SIMPLECL) test
 	make -C $(PRIMCL) test
 	make -C $(SMLCL) test

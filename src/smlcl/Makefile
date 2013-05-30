@@ -11,7 +11,7 @@ smlcl : smlcl.mlb smlcl.sml smlcl.sig
 	rm .tmpbasis
 
 .PHONY: test
-test :
+test : all
 	make -C test run
 
 .PHONY: clean
