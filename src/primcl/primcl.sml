@@ -48,8 +48,7 @@ structure PrimCL :> PRIMCL = struct
       _import "writeBuffer" : machine * int * bufP * real array -> bool;
 
   val writeIntBuf =
-      _import "writeBuffer" : MLton.Pointer.t * int *
-                                  MLton.Pointer.t * int array -> bool;
+      _import "writeBuffer" : machine * int * bufP * int array -> bool;
 
   val init_ = _import "init" : unit -> machine;
   fun init () = let val machine = init_ ();
