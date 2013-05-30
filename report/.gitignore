@@ -1,0 +1,10 @@
+*.log
+*.aux
+*.make
+*.bbl
+*.d
+*.blg
+*.fls
+*.out
+*.toc
+report.pdf

@@ -1,0 +1,36 @@
+\section{Introduction}
+
+In this paper, we present SmlCL, a Standard ML module for performing
+parallel computations on graphics cards via OpenCL.
+
+In recent years, performing parallel computations using graphics cards
+and other parallel architectures, has become increasingly easy using
+such frameworks as NVIDIA's CUDA and the cross-platform framework
+OpenCL. Parallel computations offer massive performance gains for
+certain kinds of computation, and is already a crucial part of
+software development and computer science.
+
+However, programming for OpenCL is done through a combination of C/C++
+libraries and OpenCLs own language for specifying kernels, in a very
+involved manner that is prone to programming errors. We wish to make
+it easy to utilize OpenCL's capabilities through Standard ML in an
+easy-to-use, type safe manner.
+
+We achieve this by creating a series of abstraction layers on top of
+OpenCL: First a simplified C-interface to OpenCL called SimpleCL,
+which we use to hide away many of the complexities and intricacies of
+OpenCL, followed by a simple MLton interface to SimpleCL called
+PrimCL, on top of which we then build SmlCL, to provide type safety
+and the ability to safely generate kernels.
+
+In this paper, we will first go through a short description of GPU
+programming and parallelism, as well as a short introduction to how
+OpenCL works. Then we will describe go on to describe the abstraction
+layers that has been built on top of OpenCL, starting with SimpleCL,
+continuing with PrimCL, followed by a preliminary discussion of
+SmlCL. We will then go on to discuss type safety, the benefits thereof,
+and how phantom types allow us to construct type safe OpenCL kernels
+in Standard ML, and a description of how the SmlCL module was extended
+with this functionality. Finally, we will discuss possible additions and
+extensions to my work as well as related work, followed by a
+conclusion.
