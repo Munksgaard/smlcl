@@ -44,3 +44,8 @@ fun lst 0 = []
   | lst n = n :: lst (n-1);
 
 print (Int.toString (red (fn (x, a) => Add x a) (IntC 0) (mkBuf m Int (Array.fromList (lst 60000))) Int) ^ "\n");
+
+fun rlst 0 = []
+  | rlst n = real n :: rlst (n-1);
+
+print (Real.toString (red (fn (x, a) => Add x a) (RealC 0.0) (mkBuf m Real (Array.fromList (rlst 60000))) Real) ^ "\n");
