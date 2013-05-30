@@ -25,6 +25,7 @@ structure SmlCL :> SMLCL = struct
                     | ConstReal of real
                     | Buf1Expr of index
                     | Buf2Expr of index
+                    | BufrExpr of index
                     | Variable of string
 
        and triOp = OpIf
@@ -157,6 +158,7 @@ structure SmlCL :> SMLCL = struct
   fun Var s = Expr (Variable s)
   fun Buf1 (_: 'a T) i : 'a expr = Expr (Buf1Expr i);
   fun Buf2 (_: 'a T) i : 'a expr = Expr (Buf2Expr i);
+  fun Bufr (_: 'a T) i : 'a expr = Expr (BufrExpr i);
 
   fun parens s = "(" ^ s ^ ")"
 
@@ -190,6 +192,7 @@ structure SmlCL :> SMLCL = struct
       | expr (TriExpr (ope, c, e1, e2)) = triop ope c e1 e2
       | expr (Buf1Expr i) = "buf1[" ^ indexStr i ^ "]"
       | expr (Buf2Expr i) = "buf2[" ^ indexStr i ^ "]"
+      | expr (BufrExpr i) = "bufr[" ^ indexStr i ^ "]"
       | expr (Variable s) = " " ^ s ^ " "
 
     fun clType (Real_ _) n = "__global const double* buf" ^ Int.toString n ^ ",\n"
@@ -224,7 +227,9 @@ structure SmlCL :> SMLCL = struct
           end;
 
       fun red f a (b as (t1, n, _, m)) rt =
-          let val exp = case f (Buf1 t1 (Index (Var "i")), Var "acc") of
+          let val exp1 = case f (Buf1 t1 (Index (Var "i")), Var "acc") of
+                            Expr e => expr e;
+              val exp2 = case f (Bufr t1 (Index (Var "i")), Var "acc") of
                             Expr e => expr e;
               val acc = case a of
                             Expr e => expr e;
@@ -241,7 +246,7 @@ structure SmlCL :> SMLCL = struct
                         ^ "\n"
                         ^ "  double acc = " ^ acc ^ ";\n"
                         ^ "  for (i=iGID; i<length; i = i + global_size) {\n"
-                        ^ "    acc = " ^ exp ^ ";\n"
+                        ^ "    acc = " ^ exp1 ^ ";\n"
                         ^ "  }\n"
                         ^ "  bufr[iGID] = acc;\n"
                         ^ "\n"
@@ -250,7 +255,7 @@ structure SmlCL :> SMLCL = struct
                         ^ "  acc = " ^ acc ^ ";\n"
                         ^ "  if (get_global_id(0) == 0) {\n"
                         ^ "    for (i=0; i<length && i<global_size; i++) {\n"
-                        ^ "      acc = " ^ exp ^ ";\n"
+                        ^ "      acc = " ^ exp2 ^ ";\n"
                         ^ "    }\n"
                         ^ "    bufr[0] = acc;\n"
                         ^ "  }\n"
