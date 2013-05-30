@@ -1,15 +1,16 @@
 \section{Type Safety and Phantom Types}
 
-When executing OpenCL kernels normally, there is no way to guarantee
-type safety. Kernels are specified in OpenCLs C-derived language, and
-are imported as text files with no knowledge of which arguments are
-required for correct execution, buffers are read and written
-completely untyped, and kernel arguments are set with complete
-disregard for the actual arguments and types required. As a result, we
-have no way to to guarantee that a given OpenCL program will execute
-correctly. Luckily, given an interface like PrimCL, we can utilize
-Standard MLs type system too construct a system that allows us to
-execute kernels in a statically checked, type-safe manner.
+When executing OpenCL kernels using the simple interface provided by
+PrimCL, there is no way to guarantee type safety. Kernels are
+specified in OpenCLs C-derived language, and are imported as text
+files with no knowledge of which arguments are required for correct
+execution, buffers are read and written completely untyped, and kernel
+arguments are set with complete disregard for the actual arguments and
+types required. As a result, we have no way of guaranteeing that a
+given OpenCL program will execute correctly. Luckily, given an
+interface like PrimCL, we can utilize Standard MLs type system to
+construct a system that allows us to execute kernels in a statically
+checked, type-safe manner.
 
 \subsection{An Introduction to Phantom Types}
 
@@ -20,11 +21,11 @@ OpenCL device, like the following:
 \begin{lstlisting}[language=ML, caption=Signatures for a primitive
     SmlCL module,label=smlcl1,mathescape]
 signature OPENCL = sig
-  type T;
-  val Real: T;
-  val Int: T;
-  type bufP;
-  type kern2;
+  type T
+  val Real: T
+  val Int: T
+  type bufP
+  type kern2
 
   (* Creates a buffer from a type constructor and a size *)
   val mkBuf : T -> int -> bufP
@@ -34,19 +35,20 @@ signature OPENCL = sig
   val mkKern2 : string -> (T * T) -> kern2
 
   val runKern2 : kern2 -> (bufP * bufP) -> unit
-end;
+end
 \end{lstlisting}
 
-where the type \texttt{T} defines the type of buffers (here providing
-the constructors \texttt{Int} and \texttt{Real}), and where
-\texttt{bufP} and \texttt{kern2} save the argument types they were
-created with (like \texttt{type bufP = T * int * $\ldots$}).
+In listing \ref{smlcl1}, the type \texttt{T} defines the type of
+buffers (here providing the constructors \texttt{Int} and
+\texttt{Real}), type \texttt{bufP} represents a buffer, and
+\texttt{kern2} is a kernel that takes two buffers as arguments and
+returns one buffer as the result.
 
 We now want to make sure that we only execute kernels with the right
 combination of arguments. That is, if we've specified a kernel that
-takes two \texttt{Int} buffers as arguments, we wish to make sure
-that \texttt{runKern2} verifies that the types of the buffers correspond with
-the types of the arguments to the kernel.
+takes two \texttt{Int} buffers as arguments, we wish to make sure that
+\texttt{runKern2} verifies that the types of the buffers correspond
+with the types of the arguments to the kernel.
 
 One way to do this would be to add a lot of cases to the declaration
 of \texttt{runKern2}, like so:
@@ -71,7 +73,10 @@ type-safe. In order to achieve that, we can introduce so-called
 when declaring a type, but not necesarily used on the right hand side
 of the declaration. We can use these extra type variables to enforce
 type constraints in our functions. Consider this modified version of
-Listing \ref{smlcl1}:
+Listing \ref{smlcl1}, which also includes a structure,
+\texttt{OpenCL}, implementing the signature \texttt{OPENCL}, (for
+simplicity, \texttt{bufP} and \texttt{kern2} are just implemented as
+the unit type):
 
 \begin{lstlisting}[language=ML, caption=Adding type
     variables,label=smlcl2,mathescape]
@@ -91,12 +96,7 @@ signature OPENCL = sig
 
   val runKern2 : ($\alpha$, $\beta$)kern2 -> ($\alpha$ bufP * $\beta$ bufP) -> unit
 end;
-\end{lstlisting}
 
-and an accompanying structure (for simplicity, \texttt{bufP} and
-\texttt{kern2} are just implemented as the unit type).
-
-\begin{lstlisting}[language=ML, caption=Structure with phantom types,mathescape]
 structure OpenCL :> OPENCL = struct
   datatype $\alpha$ T = Real | Int;
 
@@ -132,7 +132,7 @@ for this to work, otherwise we could construct statements such as
 \texttt{runKern2 (mkKern2 "" (Real, Real)) (mkBuf Int 42, mkBuf Int
   43);}.
 
-This technique also allow us to simulate a kind of ad-hoc
+This technique also allows us to simulate a kind of ad-hoc
 polymorphism, allowing us to perform casing on the types of the
 arguments to a function. Suppose that we wanted to create a function
 that reads the contents of a buffer into an array:
@@ -173,7 +173,7 @@ following implementation, where we've also included a new version of
 the \texttt{$\alpha$T} datatype:
 
 \begin{lstlisting}[language=ML, caption=readBuf implementation using
-    clojures,mathescape]
+    closures,mathescape]
   type $\alpha$ bufP = ($\alpha$ T * int * $\ldots$)
   datatype $\alpha$ T = Real_ of int -> $\alpha$ array
                | Int_ of int -> $\alpha$ array;
@@ -196,7 +196,7 @@ the \texttt{$\alpha$T} datatype:
 Here, the type constructors \texttt{Real\_} and \texttt{Int\_} include a
 polymorphic function that we use to create the array with. When we
 instantiate the type constructors using \texttt{Real} and
-\texttt{Int}, we include a clojure for that specific type, and since
+\texttt{Int}, we include a closure for that specific type, and since
 it unifies with the phantom type provided, it all type checks. Note
 that we could also have included a ``default'' value, such as $0.0$
 and $0$, but we have chosen to use the first approach, since it adds a

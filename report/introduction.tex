@@ -13,15 +13,15 @@ software development and computer science.
 However, programming for OpenCL is done through a combination of C/C++
 libraries and OpenCLs own language for specifying kernels, in a very
 involved manner that is prone to programming errors. We wish to make
-it easy to utilize OpenCL's capabilities through Standard ML in an
-easy-to-use, type safe manner.
+it easy to utilize parallel architectures through Standard ML, by
+interfacing with OpenCL in an easy-to-use, type safe manner
 
 We achieve this by creating a series of abstraction layers on top of
 OpenCL: First a simplified C-interface to OpenCL called SimpleCL,
 which we use to hide away many of the complexities and intricacies of
 OpenCL, followed by a simple MLton interface to SimpleCL called
-PrimCL, on top of which we then build SmlCL, to provide type safety
-and the ability to safely generate kernels.
+PrimCL, on top of which we then build SmlCL. The SmlCL layer will
+allow us to generate and execute type-safe kernels.
 
 In this paper, we will first go through a short description of GPU
 programming and parallelism, as well as a short introduction to how

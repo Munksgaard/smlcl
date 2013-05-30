@@ -8,10 +8,10 @@ Standard ML, without divulging too much of OpenCLs internal workings.
 
 In order to achieve this, we have built a series of abstraction layers
 on top of OpenCL: \emph{SimpleCL} is a C library that provides a
-simplified C API to the OpenCL API, the first iteration of \emph{SmlCL} then
-provided a dumb interface from \emph{MLton}, an implementation of Standard
-ML, to SimpleCL. Building on top of SmlCL, we've added the ability to
-safely generate typed kernels and execute them in a type safe manner.
+simplified C API to the OpenCL API, PrimCL provides a dumb interface
+from \emph{MLton}, an implementation of Standard ML, to
+SimpleCL. Finally, SmlCL builds on top of PrimCL, and allows us to
+generate typed kernels and execute them safely.
 
 \subsection{SimpleCL}
 
@@ -22,7 +22,7 @@ implementing a complete interface from Standard ML to the OpenCL API,
 the first step was to create SimpleCL, a simplified OpenCL API in C,
 that could hide some of the complexities of the OpenCL framework.
 
-In its current form, SimpleCL provides the following interface:
+SimpleCL exposes the following functions:
 
 \begin{itemize}
   \item \texttt{sclInit}: Returns a \texttt{simplecl\_machine},
@@ -62,8 +62,9 @@ function calls.
 To facilitate this, \texttt{sclInit} makes some assumptions about the
 intentions of the user and the programs to be executed, for example,
 while OpenCL supports both CPUs, GPUs and dedicated accelerators,
-\texttt{sclInit} always tries returns a GPU device. If none is found,
-it returns NULL and indicates failure.
+SimpleCL is only targeted at GPU devices, and as a result
+\texttt{sclInit} will fail, returning \texttt{NULL}, if such a device
+is not found.
 
 Similarly, \texttt{sclCompile} assumes that only one kernel is to be
 compiled for each string of source code it gets. It is not possible to
@@ -76,7 +77,7 @@ NVIDIA Kepler GK110, we will not be able to take advantage of the
 built-in read-only cache, which may result in sub-optimal performance
 for some programs. However, as our goal was to achieve maximum
 flexibility and ease-of-use, while minimizing complexity, this was
-deemed a reasonable compromise. This way, buffers can be re-purposed
+deemed a reasonable compromise. This way, buffers can be reused
 easily and kernels can both read and write to them at their leisure.
 
 One of the other compromises that we've had to make, is that kernels

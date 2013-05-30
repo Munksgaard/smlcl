@@ -18,9 +18,6 @@ array, but it only takes half the time.
 
 \subsection{Parallel architectures}
 
-Of course, many different parallel architectures exist, with
-individual scales and applications.
-
 \emph{Grid computing systems}, where computation takes places across
 multiple independent administrative domains, offer the largest scale
 of parallel computing. Typically, grids, as they are also called, are
@@ -36,7 +33,7 @@ systems offer massive computational power, at the cost of low speed of
 transfer, as well as the need to have a central server delegate
 sub-tasks to the individual participants in the grid. As a result of
 the low speed of transfer, the sub-tasks must be relatively
-independent, and require a high-time-of-computation to data-size
+independent, and require a high time-of-computation to data-size
 ratio, for grids to be efficient.
 
 \emph{MMP (Massively Parallel Processor) systems}, commonly associated
@@ -108,9 +105,9 @@ multiprocessor has 64 KB of memory that is shared between its cores,
 in addition to 1536 KB memory that is shared between all of the
 streaming multiprocessors.
 
-In order to efficiently take advantage of all this parallel processing
-power, special care must be taken when programming for the GPU. We
-have to efficiently divide the work into parts, distribute them across
+In order to take advantage of all this parallel processing power in an
+efficient manner, special care must be taken when programming for the
+GPU. We have to divide the work into parts, distribute them across
 groups and cores, make sure that cores do not overwrite the work of
 each other, synchronize results and so on. Luckily, frameworks, such
 as \emph{OpenCL}, can help us with these tasks~\footnote{CUDA is
@@ -126,13 +123,13 @@ Group~\cite{khronos}, and since embraced by numerous hardware and
 software companies, including AMD and NVIDIA, the two biggest
 manufacturers of GPUs, OpenCL is ``a framework suited for parallel
 programming of heterogeneous systems''~\cite{opencl-quote}. With it,
-you can write programs that runs uniformly on both CPUs and GPUs, as
-well as Digital Signal Processors and other kinds processors
+you can write programs that run uniformly on both CPUs and GPUs, as
+well as Digital Signal Processors and other kinds of processors
 supporting the framework, allowing you to take advantage of many
 different architectures using the same code.
 
 In OpenCL, programs are made up of \emph{kernels}, which are written
-in a C-like language and some host code. Each kernel takes a set of
+in a C-like language, and some host code. Each kernel takes a set of
 arguments, performs some kind of computation, and modifies one or more
 of the arguments to include the result (in OpenCL, kernels cannot
 return values, therefore results are returned to the caller via

@@ -4,14 +4,14 @@
 The current implementation of SmlCL represents an initial
 implementation of a Standard ML interface to OpenCL, that tries to
 keep within the functional paradigms of SML, while allowing users to
-take advantage of some of the capabailities of modern GPUs. While it
+take advantage of some of the capabilities of modern GPUs. While it
 achieves many of its goals by being easy and safe to use, it does not
 yet take full advantage of OpenCL and its capabilities, and thus there
 is still plenty of room for improvements.
 
-A relatively simple addition to the current interface would be to
-allow for additional types of buffers and values. Right now, SmlCL
-only supports buffers and constants of type \texttt{int} and
+A relative simple addition to the current interface would be to
+allow for additional types of buffers and values. Currently, SmlCL
+only supports buffers and base values of type \texttt{int} and
 \texttt{real} (\texttt{int} and \texttt{double} in C,
 respectively). Although C does not have native support for boolean
 values like \texttt{true} and \texttt{false}, it does support boolean
@@ -19,7 +19,7 @@ logic, simply by regarding the number $0$ as false, and everything
 else as true.  Support for SML characters like \texttt{\#"a"} could
 also be added rather easily, since for most cases they share the same
 representation in Standard ML and C. Strings could also be passed
-rather easily, but you would need to take special care not to allow
+rather easily, but special care needs to be taken not to allow
 any overflows, since different SML implementations have different
 representations of strings (they are not null terminated in MLton, for
 example). However, adding support for tuples and datatypes is not very
@@ -28,7 +28,7 @@ functions, and it would needlessly complicate kernels as well.
 
 Another trivial extension to SmlCL would be to add more versions of
 \texttt{mkKern} and \texttt{kcall}, each allowing a different amount
-of buffer arguments. You would need to add run functions to all the
+of buffer arguments. One would need to add run functions to all the
 layers of SmlCL, including PrimCL and SimpleCL, but the
 implementations would be more or less identical to the already
 existing run functions.
@@ -73,7 +73,7 @@ private variables, and so forth. This could be done in a number of
 ways, one could either provide sufficient constructs such that our
 expression interface mimics OpenCL C, or one could keep a functional
 approach and add more constructs like \texttt{Map} and \texttt{Fold},
-\texttt{let} statements, and the like to the language. Either way, the
+\texttt{Let} statements, and the like to the language. Either way, the
 more advanced we want our kernel expression language to be, the closer
 we get to writing a complete compiler for a new language. For this
 project, we have therefore chosen to keep it relatively simple, in
