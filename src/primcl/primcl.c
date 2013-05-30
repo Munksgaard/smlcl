@@ -21,12 +21,12 @@ Pointer init() {
   }
 }
 
-Pointer compile(Pointer p, char * name, char * src) {
+Pointer compile(Pointer p, char * name, char * src, int n) {
   int err = SIMPLECL_SUCCESS;
 
   simplecl_machine machine = (simplecl_machine)p;
 
-  simplecl_kernel kernel = sclCompile(machine, name, src, &err);
+  simplecl_kernel kernel = sclCompile(machine, name, src, n, &err);
   if (err != SIMPLECL_SUCCESS) {
     printf("Compile failed\n");
     return NULL;

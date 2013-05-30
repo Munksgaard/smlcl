@@ -38,14 +38,16 @@ structure PrimCL :> PRIMCL = struct
                        SOME machine
                 end;
 
-  val compile_ = _import "compile" : machine * string * string -> kernel;
-  fun compile x = let val k = compile_ x;
-                  in
-                      if k = MLton.Pointer.null then
-                          NONE
-                      else
-                          SOME k
-                  end;
+  val compile_ = _import "compile" : machine * string * string * int -> kernel;
+  fun compile (m, name, src) =
+      let val len = size src;
+          val k = compile_ (m, name, src, len);
+      in
+          if k = MLton.Pointer.null then
+              NONE
+          else
+              SOME k
+      end;
 
   val kcall1 = _import "run1" : machine * kernel * int * bufP * bufP -> bool;
 

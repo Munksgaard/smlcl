@@ -18,6 +18,7 @@ simplecl_machine sclInit(int * err);
 simplecl_kernel sclCompile(simplecl_machine machine,
                            const char * name,
                            const char * src,
+                           int n,
                            int * err);
 
 /* Creates a read-write buffer on the device.

@@ -1,4 +1,7 @@
 #include <simplecl.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
 
 const char * vectordouble_src = "#pragma OPENCL EXTENSION cl_khr_fp64 : enable \n\n__kernel void VectorDouble(__global const double* a, __global double* c) {\n"
   "    int iGID = get_global_id(0);\n"
@@ -19,8 +22,8 @@ int main() {
     return -1;
   }
   printf("Successfully initiated\n");
-  simplecl_kernel kernel1 = sclCompile(machine, "VectorDouble", vectordouble_src, &err);
-  simplecl_kernel kernel2 = sclCompile(machine, "VectorAdd", vectoradd_src, &err);
+  simplecl_kernel kernel1 = sclCompile(machine, "VectorDouble", vectordouble_src, strlen(vectordouble_src), &err);
+  simplecl_kernel kernel2 = sclCompile(machine, "VectorAdd", vectoradd_src, strlen(vectoradd_src), &err);
   printf("Compiled kernel\n");
 
   const cl_int num_values = 100000;

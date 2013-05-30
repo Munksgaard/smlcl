@@ -61,10 +61,11 @@ simplecl_machine sclInit(int *return_err) {
 
 }
 
-simplecl_kernel sclCompile(simplecl_machine machine, const char * name, const char * src, int * return_err) {
+simplecl_kernel sclCompile(simplecl_machine machine, const char * name, const char * src, int n, int * return_err) {
   int err = CL_SUCCESS;
+  const size_t tmp = (size_t)n;
 
-  cl_program program = clCreateProgramWithSource(machine->context, 1, &src, NULL, &err);
+  cl_program program = clCreateProgramWithSource(machine->context, 1, &src, &tmp, &err);
   if (err != CL_SUCCESS) {
     printf("Error in clCreateProgramWithSource, Line %u in file %s !!!\n\n", __LINE__, __FILE__);
     *return_err = SIMPLECL_FAILURE;
