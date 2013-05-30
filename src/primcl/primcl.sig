@@ -7,9 +7,9 @@ signature PRIMCL = sig
   val intSize : sz;
   val realSize : sz;
 
-  val mkBufInt : machine * sz * int * int array -> bufP;
-  val mkBufReal : machine * sz * int * real array -> bufP;
-  val mkBufEmpty : machine * sz * int -> bufP;
+  val mkBufInt : machine * sz * int * int array -> bufP option;
+  val mkBufReal : machine * sz * int * real array -> bufP option;
+  val mkBufEmpty : machine * sz * int -> bufP option;
 
   val readIntBuf : machine * sz * int * bufP * int array -> bool;
   val readRealBuf : machine * sz * int * bufP * real array -> bool;

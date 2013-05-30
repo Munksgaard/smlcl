@@ -8,16 +8,37 @@ structure PrimCL :> PRIMCL = struct
   val intSize = 4;
   val realSize = 8;
 
-  val mkBufInt =
+  val mkBufInt_ =
       _import "createBuffer" : machine * int * int
                                    * int array -> bufP;
-  val mkBufReal =
+  fun mkBufInt x =
+      let val b = mkBufInt_ x
+      in if b = MLton.Pointer.null then
+             NONE
+         else
+             SOME b
+      end;
+
+  val mkBufReal_ =
       _import "createBuffer" : machine * int * int
                                    * real array -> bufP;
+  fun mkBufReal x =
+      let val b = mkBufReal_ x
+      in if b = MLton.Pointer.null then
+             NONE
+         else
+             SOME b
+      end;
 
   val mkBufEmpty_ = _import "createBuffer" : machine * sz * int * MLton.Pointer.t
                                              -> bufP;
-  fun mkBufEmpty (m, t, n) = mkBufEmpty_(m, t, n, MLton.Pointer.null);
+  fun mkBufEmpty (m, t, n) =
+      let val b = mkBufEmpty_(m, t, n, MLton.Pointer.null)
+      in if b = MLton.Pointer.null then
+             NONE
+         else
+             SOME b
+      end;
 
   val readIntBuf =
       _import "readBuffer" : machine * int * int * bufP * int array -> bool;

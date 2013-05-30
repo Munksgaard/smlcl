@@ -50,9 +50,14 @@ structure SmlCL :> SMLCL = struct
                 end;
 
   fun mkBufInt (m, arr) =
-      PrimCL.mkBufInt (m, PrimCL.intSize, Array.length arr, arr);
+      case PrimCL.mkBufInt (m, PrimCL.intSize, Array.length arr, arr) of
+          NONE => raise Fail "Error creating buffer"
+        | SOME x => x;
+
   fun mkBufReal (m, arr) =
-      PrimCL.mkBufReal (m, PrimCL.realSize, Array.length arr, arr);
+      case PrimCL.mkBufReal (m, PrimCL.realSize, Array.length arr, arr) of
+          NONE => raise Fail "Error creating buffer"
+        | SOME x => x;
 
   fun readIntBuf (m, n, b) =
       let val arr = Array.array(n, 0) in
@@ -103,7 +108,9 @@ structure SmlCL :> SMLCL = struct
       else
           raise Fail "buffer not big enough";
 
-  val mkBufEmpty = PrimCL.mkBufEmpty;
+  fun mkBufEmpty x = case PrimCL.mkBufEmpty x of
+                         NONE => raise Fail "Error creating buffer"
+                       | SOME x => x;
 
   fun kcall1 (m, k, name, rt, src) (t1, sz1, bp1, _) worksize =
       case rt of
