@@ -205,13 +205,10 @@ structure SmlCL :> SMLCL = struct
       | expr (Buf1Expr i) = "buf1[" ^ indexStr i ^ "]"
       | expr (Buf2Expr i) = "buf2[" ^ indexStr i ^ "]"
       | expr (BufrExpr i) = "bufr[" ^ indexStr i ^ "]"
-      | expr (Variable s) = " " ^ s ^ " "
+      | expr (Variable s) = s
 
-    fun clType (Real_ _) n = "__global const double* buf" ^ Int.toString n ^ ",\n"
-      | clType (Int_ _) n = "__global const int* buf" ^ Int.toString n ^ ",\n";
-
-    fun rType (Real_ _) = "__global double* bufr) {\n"
-      | rType (Int_ _) = "__global int* bufr) {\n";
+    fun ctype (Real_ _) = "double"
+      | ctype (Int_ _) = "int";
 
     fun expr1 f t1 r s =
         case f (Buf1 t1) of
@@ -226,41 +223,48 @@ structure SmlCL :> SMLCL = struct
           in
               "#pragma OPENCL EXTENSION cl_khr_fp64 : enable\n"
               ^ "\n"
-              ^ "__kernel void " ^ s ^ "(\n " ^ clType t1 1 ^ rType r
-              ^ "int iGID = get_global_id(0);\nbufr[iGID] = " ^ src ^ ";\n}\n"
+              ^ "__kernel void " ^ s ^ "(__global " ^ ctype t1 ^ "* buf1,\n"
+              ^ "                        __global " ^ ctype r ^ "* bufr) {\n"
+              ^ "  int iGID = get_global_id(0);\n"
+              ^ "  bufr[iGID] = " ^ src ^ ";\n"
+              ^ "}\n"
           end;
       fun compile2 f (t1, t2) r s =
           let
               val src = expr2 f (t1, t2) r s
           in
-              "#pragma OPENCL EXTENSION cl_khr_fp64 : enable\n"
-              ^ "__kernel void " ^ s ^ "(\n" ^ clType t1 1 ^ clType t2 2 ^ rType r
-              ^ "int iGID = get_global_id(0);\nbufr[iGID] = " ^ src ^ ";\n}\n"
+              "#pragma OPENCL EXTENSION cl_khr_fp64 : enable\n\n"
+              ^ "__kernel void " ^ s ^ "(__global " ^ ctype t1 ^ "* buf1,\n"
+              ^ "                        __global " ^ ctype t2 ^ "* buf2,\n"
+              ^ "                        __global " ^ ctype r ^ "* bufr) {\n"
+              ^ "  int iGID = get_global_id(0);\n"
+              ^ "  bufr[iGID] = " ^ src ^ ";\n"
+              ^ "}\n"
           end;
 
       fun red f a (b as (t1, n, _, m)) rt =
           let val exp1 = case f (Buf1 t1 (Index (Var "i")), Var "acc") of
                             Expr e => expr e;
-              val exp2 = case f (Bufr t1 (Index (Var "i")), Var "acc") of
+              val exp2 = case f (Buf1 t1 (Index (Var "i")), Var "acc") of
                             Expr e => expr e;
               val acc = case a of
                             Expr e => expr e;
               val src = "#pragma OPENCL EXTENSION cl_khr_fp64 : enable\n"
                         ^ "\n"
-                        ^ "__kernel void reduce(" ^ clType t1 1
-                        ^ "                     " ^ clType Int 2
-                        ^ "                     " ^ rType rt
+                        ^ "__kernel void reduce(__global " ^ ctype t1 ^ "* buf1,\n"
+                        ^ "                     __global int* buf2,\n"
+                        ^ "                     __global " ^ ctype rt ^ "* bufr) {"
                         ^ "  int length = buf2[0];\n"
                         ^ "  int iGID = get_global_id(0);\n"
                         ^ "  int global_size = get_global_size(0);\n"
                         ^ "\n"
                         ^ "  int i;\n"
                         ^ "\n"
-                        ^ "  double acc = " ^ acc ^ ";\n"
+                        ^ "  " ^ ctype rt ^ " acc = " ^ acc ^ ";\n"
                         ^ "  for (i=iGID; i<length; i = i + global_size) {\n"
                         ^ "    acc = " ^ exp1 ^ ";\n"
                         ^ "  }\n"
-                        ^ "  bufr[iGID] = acc;\n"
+                        ^ "  buf1[iGID] = acc;\n"
                         ^ "\n"
                         ^ "  barrier(CLK_GLOBAL_MEM_FENCE);\n"
                         ^ "\n"
@@ -276,8 +280,9 @@ structure SmlCL :> SMLCL = struct
                           NONE => raise OpenCL
                         | SOME x => (m, x, "reduce", rt, src);
               val lenb = mkBuf m Int (Array.fromList [n]);
-              val rbuf = kcall2 k (b, lenb) 256;
+              val rbuf = kcall2 k (b, lenb) 4;
               val arr = readBuf rbuf;
+              val _ = freeBuf rbuf;
           in
               Array.sub (arr, 0)
           end;
