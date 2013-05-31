@@ -36,7 +36,8 @@ val b5 = (writeBuf (Array.fromList [11.0, 12.0, 13.0, 14.0]) rbuf;
 
 print (kern2src k);
 
-printIList (iarr2list (readBuf (map (fn b => Mul (IntC 2) (b This)) (mkBuf m Int (Array.fromList [42,43,44,54])) Int)));
+val mapk = map m (fn b => Mul (IntC 2) b) Int Int;
+printIList(iarr2list (readBuf (kcall1 mapk (mkBuf m Int (Array.fromList [42,43,44,54])) 4)));
 
 print (Int.toString (red (fn (x, a) => If (Gt x a) x a) (IntC 0) (mkBuf m Int (Array.fromList [1,2,3,4])) Int) ^ "\n");
 
@@ -49,3 +50,7 @@ fun rlst 0 = []
   | rlst n = real n :: rlst (n-1);
 
 print (Real.toString (red (fn (x, a) => Add x a) (RealC 0.0) (mkBuf m Real (Array.fromList (rlst 60000))) Real) ^ "\n");
+
+val mapk = map m (fn x => Add x x) Int Int;
+
+print (kern1src mapk);
