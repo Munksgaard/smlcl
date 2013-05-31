@@ -2,7 +2,7 @@ open Utils;
 open Timer;
 open SmlCL;
 
-val elems = 10000000;
+val elems = 1000000;
 
 val m = init ();
 
@@ -57,7 +57,12 @@ val k = mkKern2 m "bum" (fn (x,y) => If (Lt (Add (Mul (x This)
 dotimes pi_gpu (b1, b2, k) 100;
 val gpu_t2 = Timer.checkCPUTimer gpu_t1;
 
-print ("GPU took " ^ LargeInt.toString (Time.toMilliseconds (#sys gpu_t2))
+print ("CPU took " ^ LargeInt.toString (Time.toMilliseconds (#usr cpu_t2))
        ^ " milliseconds.\n");
-print ("CPU took " ^ LargeInt.toString (Time.toMilliseconds (#sys cpu_t2))
+print ("GPU took " ^ LargeInt.toString (Time.toMilliseconds (#usr gpu_t2))
        ^ " milliseconds.\n");
+
+freeBuf b1;
+freeBuf b2;
+cleanKern2 k;
+cleanMachine m;
