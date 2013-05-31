@@ -50,7 +50,3 @@ fun rlst 0 = []
   | rlst n = real n :: rlst (n-1);
 
 print (Real.toString (red (fn (x, a) => Add x a) (RealC 0.0) (mkBuf m Real (Array.fromList (rlst 60000))) Real) ^ "\n");
-
-val iterk = iter m (fn (i, a) => (Add a i)) Int (0, 10)
-val iterb = kcall1 iterk (mkBuf m Int (Array.fromList [1,2,3,4,5,6,7,8,9,10])) 10;
-printIList (iarr2list (readBuf iterb));

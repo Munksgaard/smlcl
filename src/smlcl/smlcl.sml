@@ -249,30 +249,6 @@ structure SmlCL :> SMLCL = struct
                         | SOME x => (m, x, "map", t2, src)
           end
 
-      fun iter m f t1 (start, stop) =
-          let val exp = case f (Var "i", Var "acc") of
-                            Expr e => expr e;
-              val src =  "#pragma OPENCL EXTENSION cl_khr_fp64 : enable\n"
-                         ^ "\n"
-                         ^ "__kernel void iter(__global " ^ ctype t1 ^ "* buf1,\n"
-                         ^ "                   __global " ^ ctype t1 ^ "* bufr) {"
-                         ^ "  int iGID = get_global_id(0);\n"
-                         ^ "  int global_size = get_global_size(0);\n"
-                         ^ "\n"
-                         ^ "  int i;\n"
-                         ^ "\n"
-                         ^ "  " ^ ctype t1 ^ " acc = buf1[iGID];\n"
-                         ^ "  for (i=" ^ Int.toString start ^ "; i<" ^ Int.toString stop ^ "; i++) {\n"
-                         ^ "    acc = " ^ exp ^ ";\n"
-                         ^ "  }\n"
-                         ^ "  bufr[iGID] = acc;\n"
-                         ^ "}\n\n";
-              val _ = print src
-          in case PrimCL.compile (m, "iter", src) of
-                 NONE => raise OpenCL
-               | SOME x => (m, x, "iter", t1, src)
-          end;
-
       fun red f a (b as (t1, n, _, m)) rt =
           let val exp = case f (Buf1 t1 (Index (Var "i")), Var "acc") of
                             Expr e => expr e;
