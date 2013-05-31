@@ -242,10 +242,39 @@ structure SmlCL :> SMLCL = struct
               ^ "}\n"
           end;
 
-      fun red f a (b as (t1, n, _, m)) rt =
-          let val exp1 = case f (Buf1 t1 (Index (Var "i")), Var "acc") of
+      fun map m f t1 t2 =
+          let val src = compile1 (fn b => f (b This)) t1 t2 "map"
+          in case PrimCL.compile (m, "map", src) of
+                          NONE => raise OpenCL
+                        | SOME x => (m, x, "map", t2, src)
+          end
+
+      fun iter m f t1 (start, stop) =
+          let val exp = case f (Var "i", Var "acc") of
                             Expr e => expr e;
-              val exp2 = case f (Buf1 t1 (Index (Var "i")), Var "acc") of
+              val src =  "#pragma OPENCL EXTENSION cl_khr_fp64 : enable\n"
+                         ^ "\n"
+                         ^ "__kernel void iter(__global " ^ ctype t1 ^ "* buf1,\n"
+                         ^ "                   __global " ^ ctype t1 ^ "* bufr) {"
+                         ^ "  int iGID = get_global_id(0);\n"
+                         ^ "  int global_size = get_global_size(0);\n"
+                         ^ "\n"
+                         ^ "  int i;\n"
+                         ^ "\n"
+                         ^ "  " ^ ctype t1 ^ " acc = buf1[iGID];\n"
+                         ^ "  for (i=" ^ Int.toString start ^ "; i<" ^ Int.toString stop ^ "; i++) {\n"
+                         ^ "    acc = " ^ exp ^ ";\n"
+                         ^ "  }\n"
+                         ^ "  bufr[iGID] = acc;\n"
+                         ^ "}\n\n";
+              val _ = print src
+          in case PrimCL.compile (m, "iter", src) of
+                 NONE => raise OpenCL
+               | SOME x => (m, x, "iter", t1, src)
+          end;
+
+      fun red f a (b as (t1, n, _, m)) rt =
+          let val exp = case f (Buf1 t1 (Index (Var "i")), Var "acc") of
                             Expr e => expr e;
               val acc = case a of
                             Expr e => expr e;
@@ -262,7 +291,7 @@ structure SmlCL :> SMLCL = struct
                         ^ "\n"
                         ^ "  " ^ ctype rt ^ " acc = " ^ acc ^ ";\n"
                         ^ "  for (i=iGID; i<length; i = i + global_size) {\n"
-                        ^ "    acc = " ^ exp1 ^ ";\n"
+                        ^ "    acc = " ^ exp ^ ";\n"
                         ^ "  }\n"
                         ^ "  buf1[iGID] = acc;\n"
                         ^ "\n"
@@ -271,7 +300,7 @@ structure SmlCL :> SMLCL = struct
                         ^ "  acc = " ^ acc ^ ";\n"
                         ^ "  if (get_global_id(0) == 0) {\n"
                         ^ "    for (i=0; i<length && i<global_size; i++) {\n"
-                        ^ "      acc = " ^ exp2 ^ ";\n"
+                        ^ "      acc = " ^ exp ^ ";\n"
                         ^ "    }\n"
                         ^ "    bufr[0] = acc;\n"
                         ^ "  }\n"
@@ -308,10 +337,6 @@ structure SmlCL :> SMLCL = struct
 
   fun kern1src (_, _, _, _, src) = src;
   fun kern2src (_, _, _, _, src) = src;
-
-  fun map f (b as (t1, n, _ , m)) t2 =
-      let val k = mkKern1 m "Map" f t1 t2
-      in kcall1 k b n end;
 
   fun cleanKern1 (_, k, _, _ ,_) =
       if PrimCL.cleanKern k
