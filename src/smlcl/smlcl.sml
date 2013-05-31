@@ -285,7 +285,7 @@ structure SmlCL :> SMLCL = struct
                           NONE => raise OpenCL
                         | SOME x => (m, x, "reduce", rt, src);
               val lenb = mkBuf m Int (Array.fromList [n]);
-              val rbuf = kcall2 k (b, lenb) 4;
+              val rbuf = kcall2 k (b, lenb) 256;
               val arr = readBuf rbuf;
               val _ = freeBuf rbuf;
           in

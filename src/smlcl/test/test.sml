@@ -50,3 +50,7 @@ fun rlst 0 = []
   | rlst n = real n :: rlst (n-1);
 
 print (Real.toString (red (fn (x, a) => Add x a) (RealC 0.0) (mkBuf m Real (Array.fromList (rlst 60000))) Real) ^ "\n");
+
+val mapk = map m (fn x => Add x x) Int Int;
+
+print (kern1src mapk);
