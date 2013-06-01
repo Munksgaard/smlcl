@@ -11,9 +11,12 @@ signature UTILS = sig
     val randRList : int -> real list;
 
     val dotimes : ('a -> unit) -> 'a -> int -> unit;
+
+    val benchmark : (unit -> 'a) -> LargeInt.int;
 end;
 
 structure Utils : UTILS = struct
+  open Timer;
   val rarr2list : real array -> real list = Array.foldr (fn (x, xs) => x :: xs) []
   val iarr2list : int array -> int list = Array.foldr (fn (x, xs) => x :: xs) []
 
@@ -45,4 +48,12 @@ structure Utils : UTILS = struct
 
   fun dotimes _ _ 0 = ()
     | dotimes f x n = (f x; dotimes f x (n-1));
+
+  fun benchmark f =
+      let val t1 = Timer.startCPUTimer();
+          val _ = f ();
+          val t2 = Timer.checkCPUTimer t1;
+      in
+          Time.toMilliseconds (#usr t2)
+      end;
 end;
