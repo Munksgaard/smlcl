@@ -47,7 +47,7 @@ val arr = Array.array(elems, 0);
 fun gpu () =
     let val _ = kcall1 (m, k, elems, b1, b2);
         val _ = readIntBuf (m, intSize, elems, b1, arr);
-    in 
+    in
         print ("pi = " ^ Real.toString (real (Array.sub(arr, 0)) / (real elems * real elems) * 4.0) ^ "\n")
     end;
 
