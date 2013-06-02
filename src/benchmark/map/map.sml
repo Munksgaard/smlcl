@@ -15,7 +15,7 @@ fun map_cpu () =
 
         val tmparr = Array.tabulate
                          (elems, (fn x => (Array.sub (arr1, x) * Array.sub(arr1, x)) / 1.5))
-    in print (Real.toString (Array.foldl (fn (x, acc) => x + acc) 0.0 tmparr) ^ "\n") end;
+    in () end;
 
 fun map_gpu (b1, k) =
     let
@@ -28,13 +28,12 @@ fun map_gpu (b1, k) =
         val tmparr = readBuf tmpbuf
         val _ = freeBuf tmpbuf;
     in
-        print (Real.toString (Array.foldl (fn (x, acc) => x + acc) 0.0 tmparr) ^ "\n")
+        ()
     end;
 
 print "\nRunning GPU benchmark...\n";
 val b1 = mkBuf m Real (Array.fromList (randRList elems));
 val k = map m (fn x => Div (Mul x x) (RealC 1.5)) Real Real;
-print (kern1src k);
 val gpu_t1 = Timer.startCPUTimer ();
 dotimes map_gpu (b1, k) testn;
 val gpu_t2 = Timer.checkCPUTimer gpu_t1;
