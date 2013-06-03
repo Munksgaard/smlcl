@@ -1,1 +1,28 @@
 \section{Conclusion}
+
+In this paper we have discussed parallel architectures and programming
+and presented our Standard ML module for GPU programming, SmlCL. We
+first introduced SimpleCL and PrimCL, a simplified C wrapper for
+OpenCL and a Standard ML interface for said wrapper, that allows users
+to take advantage of the parallel processing capabilities of graphical
+processing units. Then we introduced SmlCL, a Standard ML module,
+built on PrimCL and SimpleCL, that provides a layer of security and
+convenience. It allows users to generate kernels based on a familiar
+datatype representation in Standard ML. By using phantom types, SmlCL
+ensures that all kernels generated are correctly typed, and that the
+kernel argument types match up with the buffer types we give the
+kernel as arguments. This way, we can avoid many of the bugs and
+errors that are likely to occur when writing GPU code directly in
+OpenCL.
+
+Furthermore, while PrimCL retains the full expressive power of OpenCL
+kernels, since it simply provides a wrapper around normal OpenCL code,
+we have found that our automatically generated kernels lack some
+expressive capabilities in order to take full advantage of the
+parallel architectures of GPUs. We have proposed a number of extension
+to our library that would increase expressive power greatly, and
+enable us to create much more efficient kernels. As such, SmlCL should
+be considered an initial investigation into how one can efficiently
+interface with GPU devices, and with the possibility that future
+extensions might make it a viable alternative to other high-level GPU
+programming modules.

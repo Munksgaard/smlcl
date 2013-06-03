@@ -3,15 +3,15 @@
 We want to facilitate an easy and safe way to take advantage of the
 computational power of GPUs. By hiding some of the complexities of
 parallel computations and choosing some sane default options, we hope
-to make a simple interface to OpenCL that is easily usable from
-Standard ML, without divulging too much of OpenCLs internal workings.
+to provide a simple interface to OpenCL that is easily usable from
+Standard ML, without divulging too much of OpenCLs inner workings.
 
 In order to achieve this, we have built a series of abstraction layers
 on top of OpenCL: \emph{SimpleCL} is a C library that provides a
 simplified C API to the OpenCL API, PrimCL provides a dumb interface
 from \emph{MLton}, an implementation of Standard ML, to
-SimpleCL. Finally, SmlCL builds on top of PrimCL, and allows us to
-generate typed kernels and execute them safely.
+SimpleCL, and SmlCL builds on top of PrimCL, allowing us to
+generate statically typed kernels and execute them safely.
 
 \subsection{SimpleCL}
 
@@ -22,32 +22,34 @@ implementing a complete interface from Standard ML to the OpenCL API,
 the first step was to create SimpleCL, a simplified OpenCL API in C,
 that could hide some of the complexities of the OpenCL framework.
 
-SimpleCL exposes the following functions:
+The code for SimpleCL can be seen in appendix \ref{app:simplecl}, but
+in short it exposes the following functions:
 
-\begin{itemize}
-  \item \texttt{sclInit}: Returns a \texttt{simplecl\_machine},
+\begin{description}
+  \item[\texttt{sclInit}] \hfill \\
+    Returns a \texttt{simplecl\_machine}
     which is a struct containing a \texttt{cl\_machine} and a
     \texttt{cl\_context}, or \texttt{null} on error.
-  \item \texttt{sclCompile}: Is used to compile source code into
+  \item[\texttt{sclCompile}] \hfill \\ Is used to compile source code into
     an OpenCL kernel. Returns a \texttt{simplecl\_kernel}, which is a
     struct containing a \texttt{cl\_kernel} and a
     \texttt{cl\_program}, or \texttt{null} on error.
-  \item \texttt{sclCreateBuffer}: Creates a read-write buffer,
+  \item[\texttt{sclCreateBuffer}] \hfill \\ Creates a read-write buffer,
     optionally filled with the contents of \texttt{array}.
-  \item \texttt{sclReadBuffer}: Read the contents of a buffer into an
+  \item[\texttt{sclReadBuffer}] \hfill \\ Read the contents of a buffer into an
     array.
-  \item \texttt{sclWriteBuffer}: Write the contents of an array into a
+  \item[\texttt{sclWriteBuffer}] \hfill \\ Write the contents of an array into a
     buffer.
-  \item \texttt{sclRun1}: Run a kernel with one input buffer and one
+  \item[\texttt{sclRun1}] \hfill \\ Run a kernel with one input buffer and one
     output buffer.
-  \item \texttt{sclRun2}: Run a kernel with two input buffers and one
+  \item[\texttt{sclRun2}] \hfill \\ Run a kernel with two input buffers and one
     output buffer.
-  \item \texttt{sclFreeBuffer}: Frees a buffer from memory.
-  \item \texttt{sclCleanupKernel}: Cleans up a kernel and frees it
+  \item[\texttt{sclFreeBuffer}] \hfill \\ Frees a buffer from memory.
+  \item[\texttt{sclCleanupKernel}] \hfill \\ Cleans up a kernel and frees it
     from memory.
-  \item \texttt{sclCleanupMachine}: Cleans up a machine and frees it
+  \item[\texttt{sclCleanupMachine}] \hfill \\ Cleans up a machine and frees it
     from memory.
-\end{itemize}
+\end{description}
 
 The goal was to provide a simple interface, that allows you to perform
 the basic operations required for GPU processing without having to
@@ -56,19 +58,18 @@ every function in SimpleCL is easy to use, and has a clear and well
 defined purpose. For example, only one function is required to set up
 the environment: \texttt{sclInit}, which automatically gets the device
 and platform ID, creates the appropriate context and command queue and
-returns it all in a nice struct, while checking for errors in the
+returns it all in a nice structure, while checking for errors in the
 function calls.
 
 To facilitate this, \texttt{sclInit} makes some assumptions about the
-intentions of the user and the programs to be executed, for example,
-while OpenCL supports both CPUs, GPUs and dedicated accelerators,
-SimpleCL is only targeted at GPU devices, and as a result
-\texttt{sclInit} will fail, returning \texttt{NULL}, if such a device
-is not found.
+intentions of the user and the programs to be executed. For example,
+while OpenCL supports both CPUs and GPUs, SimpleCL is only targeted at
+GPU devices, and as a result \texttt{sclInit} will fail if no such
+device is found, returning \texttt{NULL}.
 
 Similarly, \texttt{sclCompile} assumes that only one kernel is to be
 compiled for each string of source code it gets. It is not possible to
-create several kernels from the same program, without calling
+create several kernels from the same source code without calling
 \texttt{sclCompile} several times.
 
 Furthermore, buffers are always created as read-write
@@ -77,14 +78,16 @@ NVIDIA Kepler GK110, we will not be able to take advantage of the
 built-in read-only cache, which may result in sub-optimal performance
 for some programs. However, as our goal was to achieve maximum
 flexibility and ease-of-use, while minimizing complexity, this was
-deemed a reasonable compromise. This way, buffers can be reused
-easily and kernels can both read and write to them at their leisure.
+deemed a reasonable compromise. By making all buffer read-write, they
+can be reused easily and we always know that kernels can read and
+write to them at their leisure.
 
-One of the other compromises that we've had to make, is that kernels
+One of the other compromises that we've had to make is that kernels
 only take buffers as arguments. While we would like to enable users to
-add scalar arguments to their kernels, this would add a lot of
-complexity to the interface. Besides, while not nearly as efficient,
-you can still provide individual arguments in buffers of size 1.
+add scalar arguments to their kernels, this would add a bit of
+complexity to SimpleCL, and a lot of complexity to PrimCL. Besides,
+while not nearly as efficient, you can still provide individual
+arguments in buffers of size 1.
 
 Additionally, while the run functions, \texttt{sclRun1} and
 \texttt{sclRun2}, distinguish between input and output buffers by
@@ -98,15 +101,27 @@ input and output buffers.
 \subsection{PrimCL}
 
 The PrimCL library provides a simple wrapper for SimpleCL using the
-MLton foreign function interface~\cite{ffi}. The idea is that, to port
-SmlCL to another ML implementation, you just need to provide a new
+MLton foreign function interface. The idea is that, to port SmlCL to
+another ML implementation, you just need to provide a new
 implementation of PrimCL, which SmlCL can then use to communicate with
-the GPU. It also provides the constants \texttt{intSize} and
-\texttt{realSize}, which corresponds to the native size, in machine
-words, of ML integers and reals (doubles in OpenCL), respectively. A
-port would also need to modify these to fit the architecture and
-implementation of integers and reals.
+the GPU. In addition to the functions in SimpleCL, PrimCL also
+provides the constants \texttt{intSize} and \texttt{realSize}, which
+corresponds to the native size, in machine words, of ML integers and
+reals, which are used when creating buffers.
 
-With PrimCL in place, we are now ready to build another layer of
-abstraction, that will provide us with a type-safe and easy to use
-interface to OpenCL.
+It should be noted that initially, development on PrimCL took place
+using the Moscow ML~\cite{mosml} implementation of Standard ML, but
+after some struggles with the foreign function interface, it was
+decided to make the switch to MLton, which has a substantially simpler
+(but also less powerful) foreign function interface. MLton has the
+advantages that many scalars such as reals, integers, pointers, and
+characters have a simple one-to-one relation to their C equivalent
+types.
+
+Using PrimCL, we can interface with GPUs in a simple yet powerful
+manner. However, PrimCL offers no guarantees that kernels executed are
+correct, or will even run, and does not guarantee that kernels are
+correctly initiated with the correct buffers, etc. But, with PrimCL in
+place, we are now ready to build another layer of abstraction, which
+will provide us with a powerful type-safe interface to OpenCL. In
+order to do that, we have to introduce phantom types.

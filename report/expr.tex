@@ -1,54 +1,71 @@
 \section{OpenCL Kernel Generation}
 \label{kerngen}
 
-We wish to avoid having to code kernels in OpenCLs C-like language. In
-the implementation of SmlCL that we have described so far, kernels are
-simply strings that we manually attach some types to. It is easy to
-see, that this approach has the potential of introducing a great many
-bugs and errors in our program. Firstly, because we have no way of
-knowing whether or not the source code we read from a file is actually
-valid OpenCL C or not, but also because we don't know if the types
-we attach to the kernels are correct.
+We wish to avoid having to code kernels in OpenCLs C-like language,
+and to make sure that the kernels we execute using SmlCL are actually
+valid and correctly typed kernels. So far, kernels are simply strings
+that pass to a low-level function and get a pointer back. It is easy
+to see that this approach has the potential of introducing a great
+many bugs and errors in our program. Firstly, because we have no way
+of knowing whether or not the source code we read from a file or other
+input is actually valid OpenCL C or not, but also because we don't
+know if the arguments we attach to the kernels are correct.
 
 Both of these problems can be solved by having SmlCL generate kernels
 for us, which is what we have chosen to do in SmlCL.
 
-We have extended SmlCL with the type \texttt{$\alpha$ expr}, and the
-following functions for constructing expressions, where we again make
-use of phantom types to guarantee that expressions are well-typed:
+We wish to provide the user with the ability to model a wide variety
+of algebraic and boolean operations. For that purpose, we have
+extended SmlCL with the type \texttt{$\alpha$ expr}, which models
+operations on scalar values. We provide the following functions to
+construct expressions with:
 
-\begin{itemize}
-  \item \texttt{IntC}: Models an integer constant.
-  \item \texttt{RealC}: Models a constant of type real.
-  \item \texttt{Add}, \texttt{Sub}, \texttt{Mul}, and \texttt{Div}:
-    Addition, subtraction, multiplication, and division of two expressions of the same type.
-  \item \texttt{Eq}, \texttt{And}, \texttt{Or}, and \texttt{Not}:
-    Equality, and the boolean operations and, or, and not.
+\begin{description}
+  \item[\texttt{IntC}] \hfill \\ Models an integer constant.
+  \item[\texttt{RealC}] \hfill \\ Models a constant of type real.
+  \item[\texttt{Add}, \texttt{Sub}, \texttt{Mul}, and \texttt{Div}]
+    \hfill \\
+    Addition, subtraction, multiplication, and division of two
+    expressions of the same type.
   \item \texttt{IntToReal} and \texttt{RealToInt}: Conversion between
     types.
-\end{itemize}
+  \item[\texttt{True} and \texttt{False}] \hfill \\ True and false values.
+  \item[\texttt{Lt}, \texttt{Gt}, \texttt{Leq}, \texttt{Geq}] \hfill
+    \\ Less than, greater than, less than or equal, and greater than
+    or equal.
+  \item[\texttt{Eq}, \texttt{And}, \texttt{Or}, and \texttt{Not}]
+    \hfill \\
+    Equality and the boolean operations and, or, and not.
+  \item[\texttt{If}] \hfill \\ Models a conditional if-expression.
+\end{description}
 
-Note that there is seemingly no way to access the buffer-arguments to
-the kernel. In the structure implementing SmlCL, you can see that
-there are functions \texttt{Buf1} and
-\texttt{Buf2}, which take a type variable and an index (can be either
-\texttt{This}, referring to the value in the buffer corresponding to
-the particular instance of the kernel that is running, through
-\texttt{get\_global\_id(0)}, an absolute index into the array, or an
-offset from \texttt{This}), and return an expression of the given
-type. If we had simply exposed these functions to the user, he would
-be able to construct badly typed expression such as \texttt{Add (Buf1
-  Real This) (Buf1 Int This)}. Instead, the user is required to pass a
-closure to the kernel generating functions, where the arguments to the
-closure correspond to specific buffers. Here is what that looks
-like:
+Using phantom types, we can ensure that expressions are correctly
+typed, by prohibiting such expressions as \texttt{Sub True (Add (IntC
+  42) (RealC 1.0))}, which is clearly badly typed, even though their
+C-equivalents might be valid.
+
+Note that there is seemingly no way to access the buffer arguments to
+the kernel. In the structure implementing SmlCL (which can be seen in
+appendix \ref{app:smlcl}), you can see that there are functions
+\texttt{Buf1} and \texttt{Buf2}, which take a type variable and an
+index (can be either \texttt{This}, referring to the value in the
+buffer corresponding to the particular instance of the kernel that is
+running corresponding to the current global id, an absolute index into
+the array, or an offset from \texttt{This}), and return an expression
+of the given type. However if we had simply exposed these functions to
+the user, he would be able to construct badly typed expression such as
+\texttt{Add (Buf1 Real This) (Buf1 Int This)}. Instead, the user is
+required to pass a closure to the kernel generating functions, where
+the arguments to the closure are the buffers. Listing \ref{vectoradd2}
+show what that looks like.
 
 \begin{lstlisting}[mathescape,language=ML,caption=Expressing VectorAdd
   using SmlCLs expression generating capabilities.,label=vectoradd2]
   mkKern2 machine
           "VectorAdd"
-          (fn (b1, b2) => Add (b1 This) (b2 This))
-          (Real, Real)
+          (fn (b1, b2) => Add (IntToReal (b1 This)) (Mul (b2 (Index 0)) (b2
+  (Offset ~1))))
+          (Int, Real)
           Real;
 \end{lstlisting}
 
@@ -56,27 +73,28 @@ Where the types for the buffers is given as the fourth and fifth
 argument. In this way, we are guaranteed that all references to a buffer
 has the same type.
 
-As an example of how expression generation works, here is the kernel
-generated by running the code in Listing \ref{vectoradd2}:
+As an example of how expression generation works, listing
+\ref{vectoradd3} shows the kernel generated by running the code in
+listing \ref{vectoradd2}.
 
 \begin{lstlisting}[mathescape,language=C,caption=VectorAdd as
-    generated by SmlCL]
+    generated by SmlCL.,label=vectoradd3]
   #pragma OPENCL EXTENSION cl_khr_fp64 : enable
   __kernel void VectorAdd(
   __global const int* buf1,
   __global const double* buf2,
   __global double* bufr) {
-  int iGID = get_global_id(0);
-  bufr[iGID] = ((real)(buf1[iGID]) + buf2[iGID]);
+    int iGID = get_global_id(0);
+    bufr[iGID] = ((real)(buf1[iGID]) + buf2[iGID]);
   }
 \end{lstlisting}
 
 As the observant reader might have noticed, currently SmlCL can only
 represent a \emph{very} limited subset of C. For instance, there is no
-way to represent statements and control flow structures. In their
-current form, expressions are limited to a single statement, assigning
-a value to the position in the buffer corresponding to the current
-global id. While allowing us to keep the expression generator rather
-simple, this is obviously not ideal, and, as we'll discuss in chapter
-\ref{futurework}, an obvious improvement allow conditional statements
-like if statements, loops, temporary variables and the like.
+way to represent more than one statement, loops, or functions. In
+their current form, expressions are limited to a single statement,
+assigning a value to the position in the buffer corresponding to the
+current global id. While allowing us to keep the expression generator
+rather simple, this is obviously not ideal, and, as we'll discuss in
+chapter \ref{futurework}, an obvious improvement would be to allow
+individual statements, loops, and temporary variables.

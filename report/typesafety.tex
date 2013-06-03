@@ -2,13 +2,13 @@
 
 When executing OpenCL kernels using the simple interface provided by
 PrimCL, there is no way to guarantee type safety. Kernels are
-specified in OpenCLs C-derived language, and are imported as text
-files with no knowledge of which arguments are required for correct
+specified in OpenCLs C-derived language, and are imported as strings
+with no knowledge of which arguments are required for correct
 execution, buffers are read and written completely untyped, and kernel
 arguments are set with complete disregard for the actual arguments and
 types required. As a result, we have no way of guaranteeing that a
-given OpenCL program will execute correctly. Luckily, given an
-interface like PrimCL, we can utilize Standard MLs type system to
+given OpenCL program will execute correctly. Luckily, now that we have
+an interface like PrimCL, we can utilize Standard MLs type system to
 construct a system that allows us to execute kernels in a statically
 checked, type-safe manner.
 
@@ -16,7 +16,7 @@ checked, type-safe manner.
 
 Suppose that we have a set of functions for creating buffers of
 different types, for creating kernels, and for executing them on our
-OpenCL device, like the following:
+OpenCL device.
 
 \begin{lstlisting}[language=ML, caption=Signatures for a primitive
     SmlCL module,label=smlcl1,mathescape]
@@ -45,13 +45,13 @@ buffers (here providing the constructors \texttt{Int} and
 returns one buffer as the result.
 
 We now want to make sure that we only execute kernels with the right
-combination of arguments. That is, if we've specified a kernel that
+combination of arguments. That is, if we have specified a kernel that
 takes two \texttt{Int} buffers as arguments, we wish to make sure that
 \texttt{runKern2} verifies that the types of the buffers correspond
 with the types of the arguments to the kernel.
 
 One way to do this would be to add a lot of cases to the declaration
-of \texttt{runKern2}, like so:
+of \texttt{runKern2}, like in listing \ref{runKern}.
 
 \begin{lstlisting}[language=ML, caption=Casing on runKern2,
     label=runKern,mathescape]
@@ -112,25 +112,17 @@ end;
 \end{lstlisting}
 
 Now, using the constructors \texttt{Real} and \texttt{Int}, we can
-statically check that the types match up. For example \texttt{mkBuf
-  Real 3} will now create a \texttt{real bufP}, which cannot be used
-with a \texttt{(int, int)kern2}. Now \texttt{runKern2} can simply look
-like this:
+statically check that the types match up. For example, \texttt{mkBuf
+  Real 3} will create a \texttt{real bufP}, which cannot be used with
+a \texttt{(int, int)kern2}. Now, we don't have to worry about the
+types of arguments to runKern2 at run-time; Standard ML's
+Hindley-Milner type inference makes sure, at compile time, that the
+buffer types match up with the kernel types.
 
-\begin{lstlisting}[language=ML, caption=runKern2 with type variables,
-    label=runKern,mathescape]
-  fun runKern2 (_, _, $\ldots$) (_, $\ldots$) (_, $\ldots$) = $\ldots$
-\end{lstlisting}
-
-While we could assign variables to the type constructors from the
-second and third argument and dynamically check that they match with
-\texttt{t1} and \texttt{t2}, our type signatues guarantee that they
-always will.
-
-Note that we need an opaque structure, or encapsulated data structures,
-for this to work, otherwise we could construct statements such as
-\texttt{runKern2 (mkKern2 "" (Real, Real)) (mkBuf Int 42, mkBuf Int
-  43);}.
+Note that we need an opaque structure, or encapsulated data
+structures, for this to work, otherwise we could construct statements
+such as \texttt{runKern2 (mkKern2 "" (Real, Real)) (mkBuf Int 42,
+  mkBuf Int 43);}.
 
 This technique also allows us to simulate a kind of ad-hoc
 polymorphism, allowing us to perform casing on the types of the
@@ -146,12 +138,12 @@ The function would have to first create an array with
 buffer. However, since the type information for the buffer is only
 known at compile time, there is no way for us to correctly determine
 the type of the array to make, or what initial elements should be put
-in it. We could however include the type constructor in \texttt{bufP}
-and perform the casing on that, leading us to this naive
-implementation:
+in it. We could however include the type constructor in the type
+\texttt{bufP} and perform the casing on that, leading us to a naive
+implementation like the one in listing \ref{list:readbuf}.
 
-\begin{lstlisting}[language=ML, caption=Initial implementation of readBuf,
-    mathescape]
+\begin{lstlisting}[language=ML, caption=Initial implementation of
+    readBuf.,mathescape,label=list:readbuf]
   type $\alpha$ bufP = ($\alpha$ T * int * $\ldots$)
 
   fun readBuf (Real, n, $\ldots$) =
@@ -166,11 +158,11 @@ implementation:
       end;
 \end{lstlisting}
 
-However, this does not type check, as the first call to Array.array
-unifies to a \texttt{real array}, while the other call unifies to an
-\texttt{int array}. We're not completely at loss though; consider the
-following implementation, where we've also included a new version of
-the \texttt{$\alpha$T} datatype:
+However, the code in \ref{list:readbuf} does not type check, as the
+first call to Array.array unifies to a \texttt{real array}, while the
+other call unifies to an \texttt{int array}. We are not completely at
+loss though; consider instead the following implementation, where
+we have also included a new version of the \texttt{$\alpha$T} datatype:
 
 \begin{lstlisting}[language=ML, caption=readBuf implementation using
     closures,mathescape]
@@ -193,11 +185,19 @@ the \texttt{$\alpha$T} datatype:
       end;
 \end{lstlisting}
 
-Here, the type constructors \texttt{Real\_} and \texttt{Int\_} include a
-polymorphic function that we use to create the array with. When we
-instantiate the type constructors using \texttt{Real} and
-\texttt{Int}, we include a closure for that specific type, and since
-it unifies with the phantom type provided, it all type checks. Note
-that we could also have included a ``default'' value, such as $0.0$
-and $0$, but we have chosen to use the first approach, since it adds a
-lot of flexibility.
+Here, the type constructors \texttt{Real\_} and \texttt{Int\_} include
+an instantiation of the \texttt{array} function, that we can use to
+create the correct array with. When we instantiate the type
+constructors using \texttt{Real} and \texttt{Int}, we include a
+closure for that specific type, and since it unifies with the phantom
+type provided, it all type checks. Note that we could have included a
+``default'' value, such as $0.0$ and $0$, instead, but we have chosen
+to use the first approach, since it adds a lot of flexibility, and for
+all the polymorphic functions that we need to perform, we simply add
+another closure to the type.
+
+Using this technique, we can add a lot of power and safety to our
+SmlCL module. However, we still cannot know if the kernels we execute
+are actually correct or if the types correspond with the phantom
+types added in SML, and we still have to code them in OpenCL C. Now it
+is time to discuss the expression generator capabilities of SmlCL.

@@ -1,0 +1,17 @@
+\section{Correctness and Error Handling}
+\label{sec:correct}
+
+Comprehensive unit tests of SimpleCL, PrimCL or SmlCL are beyond the
+scope of this project. However, several programs, including the
+performance tests shown in earlier chapters, have been written for
+both SimpleCL, PrimCL and SimpleCL, testing some, if not all of the
+functionality, while making sure that the output for those specific
+programs are correct. This may be considered a kind of black box
+testing of the functionality of our modules.
+
+The benefit of using static type checking and phantom types in SmlCL
+is that buffers given as arguments to kernels always have the correct
+types. However, the size of the buffers are not statically checked,
+and neither are index or offset arguments to kernel buffers. As such,
+users can still create erroneous kernels that fail due to too small
+buffers. 

@@ -1,48 +1,40 @@
 \section{Type Safe OpenCL Kernel Execution}
 
-Now that we have introduced phantom types, we are ready to describe
+Now that we have described phantom types, we are ready to describe
 our implementation of SmlCL.
 
-SmlCL exposes the following functions:
+The fullSmlCL exposes the following functions:
 
-\begin{itemize}
-  \item \texttt{init}: Initiates a GPU device and returns a value of
+\begin{description}
+  \item[\texttt{init}] \hfill \\ Initiates a GPU device and returns a value of
     the type \texttt{machine}, which is used to execute commands to
     the device.
-  \item \texttt{Real} and \texttt{Int}: Returns a type variable of
+  \item[\texttt{Real} and \texttt{Int}] \hfill \\ Returns a type variable of
     type \texttt{$\alpha$ T} (instantiated with the corresponding
     types), containing closures for making, reading, and writing to
     buffers.
-  \item \texttt{mkKern1} and \texttt{mkKern2}: Is used to compile
-    kernels from source code in the form of a text string. The
-    functions are used to compile kernels that take 1 and 2 input
-    buffers as arguments, respectively, in addition to an output
-    buffer. No checking is done on the source string, so this function
-    relies on the source string being syntactically and semantically
-    correct, while relying on additional type arguments for
-    determining the type of the resulting \texttt{kern1} and
-    \texttt{kern2}.
-  \item \texttt{mkBuf}, \texttt{readBuf}, and \texttt{writeBuf}:
-    Functions for handling buffers. We can create a new buffer
-    containing the elements of an input array, read the contents of a
-    buffer into an array, and write the contents of an array to an
-    already existing buffer (while making sure that the input array is
-    no larger than the size of the buffer).
-  \item \texttt{kcall1} and \texttt{kcall2}: Executes a kernel. Takes
-    a number of input buffers as arguments, and produces a resulting
-    output buffer. Also takes an integer, the work size \texttt{n}, as
-    argument, and assumes that the output buffer contains \texttt{n}
-    elements.
-\end{itemize}
+  \item[\texttt{mkKern1} and \texttt{mkKern2}] \hfill \\ Is used to
+    compile kernels expressed using the expression generators
+    described in chapter \ref{kerngen}. The functions are used to
+    compile kernels that take 1 and 2 input buffers as arguments,
+    respectively, in addition to an output buffer. The kernels are
+    typed using phantom types, to ensure that they can only be
+    executed with buffers of the correct type.
+  \item[\texttt{mkBuf}, \texttt{readBuf}, and \texttt{writeBuf}]
+    \hfill \\ Functions for handling buffers. We can create a new
+    buffer containing the elements of an input array, read the
+    contents of a buffer into an array, and write the contents of an
+    array to an already existing buffer (while making sure that the
+    input array is no larger than the size of the buffer).
+  \item[\texttt{kcall1} and \texttt{kcall2}] \hfill \\ Executes a
+    kernel. Takes a number of input buffers as arguments, and produces
+    a resulting output buffer. Also takes an integer, the work size
+    \texttt{n}, as argument, and assumes that the output buffer
+    contains \texttt{n} elements.
+\end{description}
 
 The implementation of SmlCL takes advantage of phantom types to
 ensure that programs are well typed by making the types for buffers
 and kernels parameterized. Since they can only be instantiated using
 \texttt{Real} and \texttt{Int}, which have types \texttt{real T} and
 \texttt{int T}, respectively, they each get the appropriate type.
-
-The major weak points are \texttt{mkKern1} and \texttt{mkKern2}, since
-they rely on the user to provide the correct types for the source
-string, as well as the source string actually being correct OpenCL C.
-To help alleviate this problem, SmlCL has been extended with kernel
-generating facilities.

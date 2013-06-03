@@ -1,1 +1,57 @@
 \section{Related Work}
+
+There is quite a bit of interest in implementing high-level facilities
+for programming graphical processing units and parallel architectures
+in general.
+
+\subsection{Accelerate}
+
+Accelerate~\cite{lee2009gpu} is a Haskell-embedded array programming
+language for GPU kernels. It is a domain-specific two-level language
+for manipulating data-parallel arrays in the otherwise purely function
+Haskell, the inner level consisting of scalar operations on elements
+of arrays, and the outer level consisting of collective array
+operations such as map and zip. While SmlCL provides basic
+functionality similar to map and reduce, and could be extended with
+various other array operations like those, Accelerate also allows
+users to compose kernels konsisting of combined array operations.  It
+uses an online compiler for the embedded domain specific language,
+that targets the CUDA framework. However, work has also been done on a
+OpenCL backend for Accelerate~\cite{dybdal2011acc}, which led to the
+creation of hopencl~\cite{hopencl}, a complete set of Haskell bindings
+to OpenCL. The OpenCL port of Accelerate translates array operations
+into OpenCL kernels, which are then executed one after the other,
+using the results of previous kernel executions as input.
+
+SmlCL uses some of the same ideas as Accelerate, namely a domain
+specific language for manipulating arrays as well as kernel templates,
+but Accelerate additionally provides support for compositing kernels
+and a more epxressive DSL. Implementing some of the additional
+features that Accelerate provides in SmlCL could greatly benefit the
+project greatly.
+
+\subsection{Nikola}
+
+Nikola~\cite{mainland2010nikola} is another Haskell-embedded language
+for array computations that compiles to GPU via CUDA, either at
+run-time or compile-time. It uses existing Haskell syntax and
+automatically handles a long range of low-level CUDA details. Users
+create expressions using an abstract syntax similar to the one used in
+SmlCL, which are translated into CUDA kernels and executed by
+Nikola. Like OpenCL, Nikola's the expression generator is quite
+limited, and Nikola does not provide facilities for kernel composition
+like Accelerate. As a result, some programs are in-expressible in
+Nikola. However, Nikola also allows compilation of programs at
+run-time, so some of the limitations can be worked around.
+
+\subsection{PyCUDA}
+
+PyCUDA~\cite{klockner2009pycuda} is a Python wrapper for CUDA
+programming. It provides users with a complete interface to CUDAs API,
+while also providing higher-level abstractions that enable users to
+more conveniently take advantage of CUDA's capabilities. It too
+generates CUDA code at runtime and allows users to execute it on GPU
+devices. In addition to providing high-level constructs and expression
+generators like Nikola and Accelerator, PyCUDA also provides users
+with the ability to interact with the CUDA runtime using all the
+low-level functions that CUDA exposes.

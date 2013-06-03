@@ -31,7 +31,17 @@ Another trivial extension to SmlCL would be to add more versions of
 of buffer arguments. One would need to add run functions to all the
 layers of SmlCL, including PrimCL and SimpleCL, but the
 implementations would be more or less identical to the already
-existing run functions.
+existing run functions. However, a nicer approach would be leverage
+the type-system to allow creations of type-parameterized kernels of
+arbitrary arity, and being able to execute them with a single
+function. \citet{danvy1998functional} describes a technique for
+simulating C's \texttt{printf} function in Standard ML, that could be
+used to implement the desired n-arity kernel calls in SmlCL.
+
+One could also allow for static handling of buffer
+sizes. By emplying the techniques demonstrated in ~\cite{buffersize}
+we can statically guarantee that all kernels are called with suitably
+sized buffers.
 
 SmlCL currently only supports passing buffers as arguments to
 kernels. A nice addition would be to allow users to pass regular
@@ -73,8 +83,14 @@ private variables, and so forth. This could be done in a number of
 ways, one could either provide sufficient constructs such that our
 expression interface mimics OpenCL C, or one could keep a functional
 approach and add more constructs like \texttt{Map} and \texttt{Fold},
-\texttt{Let} statements, and the like to the language. Either way, the
-more advanced we want our kernel expression language to be, the closer
-we get to writing a complete compiler for a new language. For this
-project, we have therefore chosen to keep it relatively simple, in
-order to make sure that kernels execute correctly and efficiently.
+\texttt{Let} statements, and the like to the language. For this
+project, we have chosen to keep it relatively simple, in order to make
+sure that kernels execute correctly. The expression generator could
+also be extended to allow for kernel composition, such that one could
+be combined two or more kernels into one execution, effectively
+creating a kernel algebra. In that way you could combine, say a map
+operation and a reduce operation into a single operation, saving some
+transfer-time between the device and the host. Such an algebra would
+also give incentive to create more kernel templates like redce. An
+obvious addition to the current kernel templates, could be a kernel
+that creates an of values directly on the device.

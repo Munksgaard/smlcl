@@ -1,1 +1,24 @@
 \section{Assessment}
+
+The goal of this project was to develop a Standard ML module for
+parallel computations on graphical processing units. The module should
+be relatively simple while still allowing users leverage the great
+potential for parallel processing that GPUs have. It should also take
+advantage of Standard ML's type system in order to provide additional
+concerning buffers as well as generation and execution of kernels. 
+
+The SimpleCL library and the PrimCL wrapper for Standard ML greatly
+simplifies setting up an environment in which to run OpenCL kernels,
+while still allowing users to make fast kernels that have greatly
+increased performance compared to identical sequential program. It
+lacks some of the flexibility that the full OpenCL API, but the gains
+in simplicity and ease-of-use are significant.
+
+The SmlCL module is another layer of abstraction on top of PrimCL that
+guarantees type-safety and kernel correctness. Using SmlCL's kernel
+generator, it is easy to create kernels that perform a number of basic
+operations correctly. However, SmlCL's kernel generator capabilities
+are still somewhat limited, and does not easily allow the user to take
+full advantage of the GPUs parallel architecture. We do however
+believe that, given certain extension to the kernel generator,
+performance comparable to that of PrimCL could be achieved.
