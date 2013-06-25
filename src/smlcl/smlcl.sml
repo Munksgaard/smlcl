@@ -180,7 +180,7 @@ structure SmlCL :> SMLCL = struct
       | indexStr (OpOffset e) = "iGID + " ^ expr e
 
     and unop OpNot e = "!" ^ parens (expr e)
-      | unop OpIntToReal e = "(real)" ^ parens (expr e)
+      | unop OpIntToReal e = "(double)" ^ parens (expr e)
       | unop OpRealToInt e = "(int)" ^ parens (expr e)
 
     and binop OpEq e1 e2 = parens (expr e1 ^ " == " ^ expr e2)
