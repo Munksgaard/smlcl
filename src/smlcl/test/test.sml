@@ -54,3 +54,5 @@ print (Real.toString (red (fn (x, a) => Add x a) (RealC 0.0) (mkBuf m Real (Arra
 val mapk = map m (fn x => Add x x) Int Int;
 
 print (kern1src mapk);
+
+printIList(iarr2list (readBuf (tabulate m 1000 (fn i => i) Int)));

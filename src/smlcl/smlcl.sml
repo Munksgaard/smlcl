@@ -305,6 +305,27 @@ structure SmlCL :> SMLCL = struct
           in
               Array.sub (arr, 0)
           end;
+
+      fun tabulate m n f rt =
+          let val exp = case f (Var "iGID") of
+                            Expr e => expr e;
+              val src1 = "#pragma OPENCL EXTENSION cl_khr_fp64 : enable\n"
+                       ^ "\n"
+                       ^ "__kernel void tabulate(__global int* buf1,\n"
+                       ^ "                       __global " ^ ctype rt ^ "* bufr) {\n"
+                       ^ "  int length = buf1[0];\n"
+                       ^ "  int iGID = get_global_id(0);\n"
+                       ^ "  int global_size = get_global_size(0);\n"
+                       ^ "\n"
+                       ^ "  bufr[iGID] = " ^ exp ^ ";\n"
+                       ^ "}\n\n";
+              val k = case PrimCL.compile (m, "tabulate", src1) of
+                           NONE => raise OpenCL
+                         | SOME x => (m, x, "tabulate", rt, src1);
+              val lenb = mkBuf m Int (Array.fromList [n]);
+          in
+              kcall1 k lenb n
+          end;
   end;
 
   fun mkKern1 m name f t1 rt =

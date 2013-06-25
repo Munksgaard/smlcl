@@ -31,6 +31,7 @@ signature SMLCL = sig
 
   val map : machine -> ('a expr -> 'r expr) -> 'a T -> 'r T -> ('a, 'r)kern1;
   val red : ('a expr * 'r expr -> 'r expr) -> 'r expr -> 'a buf -> 'r T -> 'r;
+  val tabulate : machine -> int -> (int expr -> 'r expr) -> 'r T -> 'r buf
 
   val This : index;
   val Index : int expr -> index;
